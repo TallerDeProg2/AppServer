@@ -1,6 +1,6 @@
 alabaster==0.7.7
 anaconda-client
-anaconda-navigator==1.1.0
+anaconda-navigator
 argcomplete==1.0.0
 astropy==1.1.2
 Babel==2.2.0
