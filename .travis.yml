@@ -2,13 +2,9 @@ language: python
 python:
   - "3.6"
 install:
-    - pip install pytest pytest-cov
-    - pip install coveralls
+  - pip install pytest pytest-cov
+  - pip install coveralls
 script:
-    - py.test
+  - bash test.sh
 after_success:
-    - coveralls
-# # command to install dependencies
-# install: "pip install -r requirements.txt"
-# # command to run tests
-# script: pytest
+  - coveralls
