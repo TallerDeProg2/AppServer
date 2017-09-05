@@ -1,5 +1,5 @@
 alabaster==0.7.7
-anaconda-client==1.4.0
+anaconda-client
 anaconda-navigator==1.1.0
 argcomplete==1.0.0
 astropy==1.1.2
