@@ -1,1 +1,1 @@
-web: gunicorn my_folder.my_module:app
+web: gunicorn __init__:app
