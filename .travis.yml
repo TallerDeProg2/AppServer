@@ -1,0 +1,10 @@
+language: python
+python:
+  - "3.6"
+install:
+  - pip install pytest pytest-cov
+  - pip install coveralls
+script:
+  - bash test.sh
+after_success:
+  - coveralls
