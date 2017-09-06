@@ -1,0 +1,15 @@
+PROJECT_NAME      = "Prueba inicial"
+PROJECT_NAME  =  Prueba Doxygen
+OUTPUT_DIRECTORY  = doxyprueba
+INPUT             = main.py src/HelloWorld.py
+GENERATE_HTML  =  YES
+GENERATE_LATEX    = NO
+GENERATE_MAN      = NO
+GENERATE_RTF      = NO
+OPTIMIZE_OUTPUT_JAVA = YES
+QUIET             = YES
+JAVADOC_AUTOBRIEF = YES
+SEARCHENGINE      = NO
+
+
+
