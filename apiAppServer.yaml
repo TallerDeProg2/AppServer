@@ -1,0 +1,253 @@
+/users
+  get
+/users/{id}/trips
+  get
+/users/{id}/location
+	get
+/passengers
+  post
+  get
+/passengers/{id}
+  get
+  put
+  delete
+/drivers
+	get
+	post
+/drivers/{id}
+	get
+	put
+	delete
+/trips
+	get
+/trips/{id}
+	get
+/trips/{id}/cost
+	get
+/trips/{id}/paths #Direccionamiento, caminos sugeridos
+	get
+/trips/{id}/paths/{id} #Un camino sugerido en particular
+	get
+
+paths:
+  /users:
+  	get:
+  		tags:
+  		security:
+  		description: "Devuelve todos los usuarios en el sistema"
+  		responses:
+  			200:
+  				description:	"Todos los usuarios en el sistema"
+  				schema:
+  					properties:
+  						usersData:
+  							$ref: "#/definitions/UsersData"
+  			500:
+  				description: "Error inesperado"
+  				schema:
+  					$ref: "#/definitions/Error"
+  		summary: "Listado de usuarios en el sistema"
+  /passengers:
+  	get:
+  		tags:
+  		security:
+  		description: "Devuelve todos los pasajeros en el sistema"
+  		responses:
+  			200:
+  				description:	"Todos los pasajeros en el sistema"
+  				schema:
+  					properties:
+  						usersData:
+  							$ref: "#/definitions/Passengers"
+  			500:
+  				description: "Error inesperado"
+  				schema:
+  					$ref: "#/definitions/Error"
+  		summary: "Listado de pasajeros en el sistema"
+  	post:
+      tags:
+      security:
+      description: "Endpoint para dar de alta un pasajero"
+      parameters:
+        - description: "Datos para dar de alta un pasajero"
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/ApplicationUserCreate" #Crear uno con los datos q les vamos a pedir
+      responses:
+        201:
+          description: "Alta correcta"
+          schema:
+            properties:
+              user:
+                $ref: '#/definitions/Passengers'
+        400:
+          description: "Incumplimiento de precondiciones (parámetros faltantes)"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Error inesperado"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: "Dar de alta un pasajero"
+  /drivers:
+  	get:
+  		tags:
+  		security:
+  		description: "Devuelve todos los conductores en el sistema"
+  		responses:
+  			200:
+  				description:	"Todos los conductores en el sistema"
+  				schema:
+  					properties:
+  						usersData:
+  							$ref: "#/definitions/Drivers"
+  			500:
+  				description: "Error inesperado"
+  				schema:
+  					$ref: "#/definitions/Error"
+  		summary: "Listado de conductores en el sistema"
+  	post:
+      tags:
+      security:
+      description: "Endpoint para dar de alta un conductor"
+      parameters:
+        - description: "Datos para dar de alta un conductor"
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/ApplicationUserCreate" #Crear uno con los datos q les vamos a pedir
+      responses:
+        201:
+          description: "Alta correcta"
+          schema:
+            properties:
+              user:
+                $ref: '#/definitions/Drivers'
+        400:
+          description: "Incumplimiento de precondiciones (parámetros faltantes)"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Error inesperado"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: "Dar de alta un conductor"
+
+
+
+
+definitions:
+	Id:
+	    type: string
+	    description: "Identificar univoco de la entidad"  
+	UsersData:
+		properties:
+			idUser:
+				type: $ref: '#/definitions/Id'
+				description: "id del usuario"
+			name:
+				type: string
+				decription: ""
+			lastName:
+				type: string
+				description: ""
+			userName:
+				type: string
+				decription: ""
+			email:
+				type: string
+				descrition: ""
+			location:
+				type: $ref: '#/definitions/Location'
+	Location:
+    	description: "Las coordenadas utilizan la especificación de [GeoJSON](https://geojson.org/geojson-spec.html#coordinate-reference-system-objects)donde `lon` es el primer número, mientras `lat` el segundo"
+	    properties:
+	      lat:
+	        type: number
+	      lon:
+	        type: number
+
+	Drivers:
+		properties:
+			personalData:
+				type: $ref: '#/definitions/UserData'
+				description: "id del usuario"
+			car:
+				type: $ref: '#/definitions/Car'
+				description: "id del usuario"
+			ranking:
+	Passengers:
+		properties:
+			personalData:
+				type: $ref: '#/definitions/UserData'
+				description: "id del usuario"
+			paymentData:
+	PaymentData:
+		properties:
+			cash:
+				type: bool
+				description: ""	
+			creditCard:
+				type: string
+				description: "id del usuario"
+	CreditCard:
+		properties:
+			carNumber:
+			securityNumber:
+			expirationDate:
+
+	Trip:
+		properties:
+			idTrip:
+			origin:
+			destiny:
+			cost:
+	Cost:
+		type:
+		description:
+	Car:
+		properties:
+		  Brand:
+	        type: string
+	        description: Marca
+	      Model:
+	        type: string
+	        description: Modelo
+	      Plate:
+	        type: string
+	        description: Patente
+	      Year:
+	        type: integer
+	        description: Año
+	      Color:
+	        type: string
+	        description: Color
+	      State:
+	        type: string
+	        description: Estado actual del automovil
+	      Radio:
+	        type: number
+	        description: Posee radio
+	      Music:
+	        type: bool
+	        description: Permite escuchar musica
+	      AirConditioning:
+	        type: bool
+	        description: Posee aire acondicionado
+	      Others:
+	        type: string
+	        description: Descripcion y/u otras caracterisicas opcionales
+  Error:
+  properties:
+    code:
+      format: int32
+      type: integer
+    message:
+      type: string
+  type: object
+
+
+
