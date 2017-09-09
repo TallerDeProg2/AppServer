@@ -1,8 +1,13 @@
 /users
-/users/{id}
+  get
 /users/{id}/trips
-/passenger
-/passenger/{id}
+  get
+/passengers
+  post
+/passengers/{id}
+  get
+  put
+  delete
 /drivers
 /drivers/{id}
 /trips
