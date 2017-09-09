@@ -1,0 +1,117 @@
+/users
+/users/{id}
+/users/{id}/trips
+/passenger
+/passenger/{id}
+/drivers
+/drivers/{id}
+/trips
+/trips/{id}
+/trips/{id}/
+
+
+
+definitions:
+	Id:
+	    type: string
+	    description: "Identificar univoco de la entidad"  
+	UsersData:
+		properties:
+			idUser:
+				type: $ref: '#/definitions/Id'
+				description: "id del usuario"
+			name:
+				type: string
+				decription: ""
+			lastName:
+				type: string
+				description: ""
+			userName:
+				type: string
+				decription: ""
+			email:
+				type: string
+				descrition: ""
+			location:
+				type: $ref: '#/definitions/Location'
+	Location:
+    	description: "Las coordenadas utilizan la especificación de [GeoJSON](https://geojson.org/geojson-spec.html#coordinate-reference-system-objects)donde `lon` es el primer número, mientras `lat` el segundo"
+	    properties:
+	      lat:
+	        type: number
+	      lon:
+	        type: number
+
+	Drivers:
+		properties:
+			personalData:
+				type: $ref: '#/definitions/UserData'
+				description: "id del usuario"
+			car:
+				type: $ref: '#/definitions/Car'
+				description: "id del usuario"
+			ranking:
+	Passenger:
+		properties:
+			personalData:
+				type: $ref: '#/definitions/UserData'
+				description: "id del usuario"
+			paymentData:
+	PaymentData:
+		properties:
+			cash:
+				type: bool
+				description: ""	
+			creditCard:
+				type: string
+				description: "id del usuario"
+	CreditCard:
+		properties:
+			carNumber:
+			securityNumber:
+			expirationDate:
+	Trip:
+		properties:
+			idTrip:
+			origin:
+			destiny:
+			cost:
+	Cost:
+		type:
+		description:
+	Car:
+		properties:
+		  Brand:
+	        type: string
+	        description: Marca
+	      Model:
+	        type: string
+	        description: Modelo
+	      Plate:
+	        type: string
+	        description: Patente
+	      Year:
+	        type: integer
+	        description: Año
+	      Color:
+	        type: string
+	        description: Color
+	      State:
+	        type: string
+	        description: Estado actual del automovil
+	      Radio:
+	        type: number
+	        description: Posee radio
+	      Music:
+	        type: bool
+	        description: Permite escuchar musica
+	      AirConditioning:
+	        type: bool
+	        description: Posee aire acondicionado
+	      Others:
+	        type: string
+	        description: Descripcion y/u otras caracterisicas opcionales
+
+
+
+
