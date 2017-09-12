@@ -1,11 +1,17 @@
-from unittest import TestCase
-from DiccionarioBasico import getValueFromDict
-from DiccionarioBasico import logging
+#from unittest import TestCase
+import unittest
 from unittest.mock import patch
 
-class TestDiccionarioBasico(TestCase):
+import sys
+sys.path.append('../src')
 
-	@patch('logging')
+from DiccionarioBasico import getValueFromDict
+from DiccionarioBasico import logging
+
+
+class TestDiccionarioBasico(unittest.TestCase):
+
+	@patch('DiccionarioBasico.logging')
 	def test_DiccionarioBasicoHasLogging(self, mock_logger):
 		d = {}
 		key = 1
