@@ -1,94 +1,188 @@
-/users #LISTO
-  get
-/users/{userId}/trips #LISTO
-  get
-/users/{userId}/location #LISTO
-	get
-/trips #LISTO
-	get
-	post
-/trips/{tripId} #LISTO
-	get
-/trips/{tripId}/cost #Me parece q es mas una propiedad de Trip
-	get
-/trips/{tripId}/paths #Direccionamiento, caminos sugeridos #LISTO (estimativo)
-	get
-/trips/{tripId}/paths/{pathId} #Un camino sugerido en particular #LISTO (estimativo)
-	get
-/passengers #LISTO
-  post
-  get
-/passengers/{passengerId} #LISTO
-  get
-  put
-  delete
-/drivers #LISTO
-	get
-	post
-/drivers/{driverId} #LISTO
-	get
-	put
-	delete
-/drivers/{driverId}/cars #LISTO
-	get
-	post	
-/drivers/{driverId}/cars/{carId} #LISTO
-	get
-	put
-	delete
-/paymentMethod #Agregar?????
-
-
 #----------------FALTA-------------
-#tags y security de todos
-#definicion con la info para CREAR un usuario
-
+#  XXtags y security de todosXX     
+#---- LO DE VERSION QUE ONDA? 
+#definicion con la info para CREAR un usuario  creo que no, cambie los datos
+swagger: '2.0'
+info:
+  description: API para el applicaton server de Ubre
+  title: Ubre - Application Server API
+  version: 1.0.0
+host: ubre.7552.fi.uba.ar
+schemes:
+  - http
+basePath: /api
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  UserToken:  # ----------------------------???
+    type: apiKey
+    in: query
+    name: token
+tags:
+  - name: passenger
+    description: |
+      Llamados que puede realizar los pasajeros
+  - name: driver
+    description: |
+      Llamados que puede realizar los choferes
+  - name: user
+    description: |
+      Llamados que puede realizar cualquiera de los dos usuarios
 paths:
-  /users:
-  	get:
-  		tags:
-  		security:
-  		description: "Devuelve todos los usuarios en el sistema"
-  		responses:
-  			200:
-  				description:	"Todos los usuarios en el sistema"
-  				schema:
-  					properties:
-  						usersData:
-  							$ref: "#/definitions/UsersData"
-  			500:
-  				description: "Error inesperado"
-  				schema:
-  					$ref: "#/definitions/Error"
-  		summary: "Listado de usuarios en el sistema"
-  /passengers:
-  	get:
-  		tags:
-  		security:
-  		description: "Devuelve todos los pasajeros en el sistema"
-  		responses:
-  			200:
-  				description:	"Todos los pasajeros en el sistema"
-  				schema:
-  					properties:
-  						usersData:
-  							$ref: "#/definitions/Passengers"
-  			500:
-  				description: "Error inesperado"
-  				schema:
-  					$ref: "#/definitions/Error"
-  		summary: "Listado de pasajeros en el sistema"
-  	post:
+  /token:
+    post:
       tags:
-      security:
-      description: "Endpoint para dar de alta un pasajero"
+        - user
+      description: "Endpoint para generar un token para utilizar en los servicios del sistema (login)"
       parameters:
-        - description: "Datos para dar de alta un pasajero"
+        - description: "Datos para generar token"
           in: body
           name: body
           required: true
           schema:
-            $ref: "#/definitions/ApplicationUserCreate" #Crear uno con los datos q les vamos a pedir
+            $ref: '#/definitions/UserCredentials'
+      responses:
+        201:
+          description: "Token generado correctamente"
+          schema:
+            $ref: "#/definitions/Token"
+        400:
+          description: "Incumplimiento de precondiciones (parámetros faltantes)"
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: "Generar token de usuario de negocio"
+  /users:
+    get:
+      tags:
+        - user
+      security:
+        - UserToken: []  #-------------------------------------------------------
+      description: "Devuelve todos los usuarios en el sistema"
+      responses:
+        200:
+          description: "Todos los usuarios del sistema"
+          schema:
+            # properties:
+            #   usersData:
+                $ref: "#/definitions/UsersData"
+        400:
+          description: "Incumplimiento de precondiciones (parámetros faltantes)"
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        500:
+          description: "Error inesperado"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: "Listado de usuarios en el sistema"
+  /users/{userId}/location:
+    parameters:
+      - description: "Identificador del usuario"
+        in: path
+        name: userId
+        required: true
+        type: number
+    get:
+      tags:
+        - user
+      security:
+        - UserToken: []
+      description: "Devuelve toda la información acerca de la ubicación del usuario."
+      responses:
+        200:
+          description: Ubicación
+          schema:
+            properties:
+              cars:
+                $ref: '#/definitions/Location'
+        500:
+          description: "Error inesperado"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: Ubicación de un usuario
+  /users/{userId}/trips:
+    parameters:
+      - description: "Identificador del usuario"
+        in: path
+        name: userId #Ver si cambiar por passengerId o driverId o directamente meterles id a todos  --- ESTA EN USERDATA
+        required: true
+        type: number
+    get:
+      tags:
+        - user
+      security:
+        - UserToken: []
+      description: "Devuelve toda la información acerca del historial de viajes del usuario."
+      responses:
+        200:
+          description: Viajes del usuario
+          schema:
+            properties:
+              trips:
+                $ref: '#/definitions/Trip'
+        500:
+          description: "Error inesperado"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: Listado de viajes de un usuario
+  /passengers:
+    get:
+      tags:
+        - user  #---------------------------------------------- VER SI SOLO DRIVERS CON PASSANGER TAMBIEN
+      security:
+        - UserToken: [] 
+      description: "Devuelve todos los pasajeros en el sistema"
+      responses:
+        200:
+          description:  "Todos los pasajeros del sistema"
+          schema:
+            # properties:
+            #   usersData:
+                $ref: "#/definitions/UsersData"
+        400:
+          description: ""
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        500:
+          description: "Error inesperado"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: "Listado de pasajeros en el sistema"
+    post:  # ----------------------------------------ALTA USUARIO PASAJERO 
+      tags:
+        - user
+      security:
+        - UserToken: []
+      description: "Endpoint para dar de alta un pasajero"
+      parameters:
+        - description: Datos para dar de alta un pasajero
+          in: body
+          name: body
+          required: true
+          schema:
+            properties:
+              personalData:
+                $ref: "#/definitions/UsersData" 
+              presonalCredential:
+                $ref: "#/definitions/UserCredentials"
+              #paymethod: #------------------------------------------------- COMPLETAR
       responses:
         201:
           description: "Alta correcta"
@@ -105,60 +199,30 @@ paths:
           schema:
             $ref: "#/definitions/Error"
       summary: "Dar de alta un pasajero"
-  /passengers/{passengerId}:
-  	parameters:
+  /passengers/{passengerId}: 
+    parameters:
       - description: "Identificador del pasajero"
         in: path
         name: passengerId
         required: true
-        type: string
-    delete:
+        type: number
+    put:  # ------MODIFICACION USUARIO PASAJERO 
       tags:
+        - passenger
       security:
-      description: "Endpoint para dar de baja un pasajero"
-      responses:
-        204:
-          description: "Baja correcta"
-        404:
-          description: "No existe el recurso solicitado"
-          schema:
-            $ref: "#/definitions/Error"
-        500:
-          description: "Error inesperado"
-          schema:
-            $ref: "#/definitions/Error"
-      summary: "Eliminar un pasajero de la aplicación"
-    get:
-      tags:
-      security:
-      description: "Devuelve toda la información del pasajero"
-      responses:
-        200:
-          description: "Información del pasajero"
-          schema:
-            properties:
-              userData:
-                $ref: "#/definitions/Passengers" #Esto comprende personalData y paymentData?
-        404:
-          description: "Pasajero inexistente"
-          schema:
-            $ref: "#/definitions/Error"
-        500:
-          description: "Error inesperado"
-          schema:
-            $ref: "#/definitions/Error"
-      summary: "Obtener información de un pasajero"
-    put:
-      tags:
-      security:
-      description: "Modificación de los datos de un pasajero"
+        - UserToken: []
+      description: "Modificación de los datos de un pasajero indicando por su id"
       parameters:
         - description: Datos para modificar al pasajero
           in: body
           name: body
           required: true
           schema:
-            $ref: "#/definitions/ApplicationUserCreate"  #Crear uno con los datos q les vamos a pedir
+            properties:
+              personalData:
+                $ref: "#/definitions/UsersData" #Crear uno con los datos q les vamos a pedir
+              presonalCredential:
+                $ref: "#/definitions/UserCredentials"
       responses:
         200:
           description: "Modificación correcta"
@@ -175,7 +239,7 @@ paths:
           schema:
             $ref: "#/definitions/Error"
         409:
-          description: Conflicto en el update (esta mal el valor de `_ref`) #VER Q ES ESTO
+          description: Conflicto en el update (esta mal el valor de `_ref`) #---------VER Q ES ESTO
           schema:
             $ref: "#/definitions/Error"
         500:
@@ -183,26 +247,103 @@ paths:
           schema:
             $ref: "#/definitions/Error"
       summary: "Actualización de información de un pasajero"
-  /drivers:
-  	get:
-  		tags:
-  		security:
-  		description: "Devuelve todos los conductores en el sistema"
-  		responses:
-  			200:
-  				description:	"Todos los conductores en el sistema"
-  				schema:
-  					properties:
-  						usersData:
-  							$ref: "#/definitions/Drivers"
-  			500:
-  				description: "Error inesperado"
-  				schema:
-  					$ref: "#/definitions/Error"
-  		summary: "Listado de conductores en el sistema"
-  	post:
+    delete:
       tags:
+        - passenger
       security:
+        - UserToken: []
+      description: "Endpoint para dar de baja un pasajero"
+      responses:
+        204:
+          description: "Baja correcta"
+        404:
+          description: "No existe el recurso solicitado"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Error inesperado"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: "Eliminar un pasajero de la aplicación"
+    get:
+      tags:
+        - user
+      security:
+        - UserToken: []
+      description: "Devuelve toda la información del pasajero"
+      responses:
+        200:
+          description: "Información del pasajero"
+          schema:
+            properties:
+              userData:
+                $ref: "#/definitions/Passengers" #Esto comprende personalData y paymentData?  --el segundo NO deberia, si esta sacar
+        404:
+          description: "Pasajero inexistente"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Error inesperado"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: "Obtener información de un pasajero"
+  /passengers/{passengerId}/drivers:
+    parameters:
+      - description: "Identificador del usuario"
+        in: path
+        name: passengerId
+        required: true
+        type: number
+    get:
+      tags:
+        - passenger
+      security:
+        - UserToken: []
+      description: "Toda la informacion de los choferes disponibles"
+      responses:
+        200:
+          description: "Choferes disponibles"
+          schema:
+            properties:
+              user:
+                $ref: "#/definitions/Drivers"
+        400:
+          description: "Incumplimiento de precondiciones (parámetros faltantes)"
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "No existe el recurso solicitado"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Error inesperado"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: "Informacion de conductores disponibles"
+  /drivers:
+    get:
+      tags:
+        - passenger
+      security:
+        - UserToken: []
+      description: "Devuelve todos los conductores en el sistema"
+      responses:
+        200:
+          description:  "Todos los conductores en el sistema"
+          schema:
+            properties:
+              usersData:
+                $ref: "#/definitions/Drivers"
+        500:
+          description: "Error inesperado"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: "Listado de conductores en el sistema"
+    post: # -------------------------------------------------------ALTA USUARIO CHOFER 
+      tags:
+        - user
+      security:
+        - UserToken: []
       description: "Endpoint para dar de alta un conductor"
       parameters:
         - description: "Datos para dar de alta un conductor"
@@ -210,7 +351,13 @@ paths:
           name: body
           required: true
           schema:
-            $ref: "#/definitions/ApplicationUserCreate" #Crear uno con los datos q les vamos a pedir
+            properties:
+              personalData:
+                $ref: "#/definitions/UsersData" #Crear uno con los datos q les vamos a pedir
+              presonalCredential:
+                $ref: "#/definitions/UserCredentials"
+              CarData:
+                $ref: "#/definitions/Car"
       responses:
         201:
           description: "Alta correcta"
@@ -228,15 +375,60 @@ paths:
             $ref: "#/definitions/Error"
       summary: "Dar de alta un conductor"
   /drivers/{driverId}:
-  	parameters:
+    parameters:
       - description: "Identificador del conductor"
         in: path
         name: driverId
         required: true
-        type: string
+        type: number
+    put:  #--------------------------------------------------- MODIFICACION CHOFER
+      tags:
+        - driver
+      security:
+        - UserToken: []
+      description: "Modificación de los datos de un conductor"
+      parameters:
+        - description: Datos para modificar al conductor
+          in: body
+          name: body
+          required: true
+          schema:
+            properties:
+              personalData:
+                $ref: "#/definitions/UsersData" #Crear uno con los datos q les vamos a pedir
+              presonalCredential:
+                $ref: "#/definitions/UserCredentials"
+              CarData:  #  -------------------------------------------- VER SI HACER CON OTRO PATH
+                $ref: "#/definitions/Car" 
+      responses:
+        200:
+          description: "Modificación correcta"
+          schema:
+            properties:
+              user:
+                $ref: "#/definitions/Drivers"
+        400:
+          description: "Incumplimiento de precondiciones (parámetros faltantes)"
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "No existe el recurso solicitado"
+          schema:
+            $ref: "#/definitions/Error"
+        409:
+          description: Conflicto en el update (esta mal el valor de `_ref`) #VER Q ES ESTO
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Error inesperado"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: "Actualización de información de un conductor"
     delete:
       tags:
+        - driver
       security:
+        - UserToken: []
       description: "Endpoint para dar de baja un conductor"
       responses:
         204:
@@ -252,7 +444,9 @@ paths:
       summary: "Eliminar un conductor de la aplicación"
     get:
       tags:
+        - user
       security:
+        - UserToken: []
       description: "Devuelve toda la información del conductor"
       responses:
         200:
@@ -270,43 +464,8 @@ paths:
           schema:
             $ref: "#/definitions/Error"
       summary: "Obtener información de un conductor"
-    put:
-      tags:
-      security:
-      description: "Modificación de los datos de un conductor"
-      parameters:
-        - description: Datos para modificar al conductor
-          in: body
-          name: body
-          required: true
-          schema:
-            $ref: "#/definitions/ApplicationUserCreate"  #Crear uno con los datos q les vamos a pedir
-      responses:
-        200:
-          description: "Modificación correcta"
-          schema:
-            properties:
-              user:
-                $ref: "#/definitions/Drivers"
-        400:
-          description: "Incumplimiento de precondiciones (parámetros faltantes)"
-          schema:
-            $ref: "#/definitions/Error"
-        404:
-          description: "No existe el recurso solicitado"
-          schema:
-            $ref: "#/definitions/Error"
-        409:
-          description: Conflicto en el update (esta mal el valor de `_ref`) #VER Q ES ESTO-->algo de los tokens, los tokens tienen q coincidir (tienem q ser la misma version)
-          schema:
-            $ref: "#/definitions/Error"
-        500:
-          description: "Error inesperado"
-          schema:
-            $ref: "#/definitions/Error"
-      summary: "Actualización de información de un conductor"
   /drivers/{driverId}/cars:
-  	parameters:
+    parameters:
       - description: "Identificador del conductor"
         in: path
         name: driverId
@@ -314,16 +473,13 @@ paths:
         type: string
     get:
       tags:
-        - app
         - user
       security:
-        - ApplicationToken: []
-        - BusinessToken: []
-      description: |
-          Devuelve toda la información acerca de todos los autos del conductor.
+        - UserToken: []
+      description: "Devuelve toda la información acerca del auto del conductor."
       responses:
         200:
-          description: Autos del conductor
+          description: Auto del conductor
           schema:
             properties:
               cars:
@@ -333,15 +489,14 @@ paths:
           schema:
             $ref: "#/definitions/Error"
       summary: Listado de autos de un usuario
-    post:
+    post:  #------------------------------------------------------mmmm  puede tener muchos autos, cambie el plural de arriba, VER
       tags:
-        - app
+        - driver
       security:
-        - ApplicationToken: []
+        - UserToken: []
       description: "Endpoint para dar de alta un auto de un usuario"
       parameters:
-        - description: |
-            Datos del auto, se ignorarán los campos de `id`, `_ref` y `owner`
+        - description: "Datos del auto, se ignorarán los campos de `id`, `_ref` y `owner`"   #---lo agregaste o puro CP
           in: body
           name: body
           required: true
@@ -352,8 +507,8 @@ paths:
           description: "Alta correcta"
           schema:
             properties:
-              metadata:
-                $ref: '#/definitions/EntityMetadata'
+              # metadata:
+              #   $ref: '#/definitions/EntityMetadata'
               car:
                 $ref: '#/definitions/Car'
         400:
@@ -365,25 +520,23 @@ paths:
           schema:
             $ref: "#/definitions/Error"
       summary: "Dar de alta un auto de un conductor"
-  /drivers/{driverId}/cars/{carId}:
-  	parameters:
+  /drivers/{driverId}/cars/{carId}: 
+    parameters:
       - description: "Identificador del conductor"
         in: path
         name: driverId
         required: true
-        type: string
+        type: number
       - description: "Identificador del auto"
         in: path
         name: carId
         required: true
-        type: string
+        type: number
     delete:
       tags:
-        - app
-        - manager
+        - driver
       security:
-        - ApplicationToken: []
-        - BusinessToken: []
+        - UserToken: []
       description: "Endpoint para dar de baja un auto"
       responses:
         204:
@@ -399,11 +552,9 @@ paths:
       summary: "Eliminar el auto"
     get:
       tags:
-        - app
         - user
       security:
-        - ApplicationToken: []
-        - BusinessToken: []
+        - UserToken: []
       description: "Devuelve toda la información del auto"
       responses:
         200:
@@ -423,9 +574,9 @@ paths:
       summary: "Obtener información de un auto"
     put:
       tags:
-        - app
+        - driver
       security:
-        - ApplicationToken: []
+        - UserToken: []
       description: "Modificación de los datos de un auto"
       parameters:
         - description: Datos nuevos del auto
@@ -449,51 +600,51 @@ paths:
           description: "No existe el recurso solicitado"
           schema:
             $ref: "#/definitions/Error"
-        409:
-          description: Conflicto en el update (esta mal el valor de `_ref`)
-          schema:
-            $ref: "#/definitions/Error"
         500:
           description: "Error inesperado"
           schema:
             $ref: "#/definitions/Error"
       summary: "Actualizar información de un auto"
-  /users/{userId}/trips:
-  	parameters:
+  /drivers/{driverId}/passengers:  # drivers/{userId}/trips ?????????????--------
+    parameters:
       - description: "Identificador del usuario"
         in: path
-        name: userId #Ver si cambiar por passengerId o driverId o directamente meterles id a todos
+        name: driverId
         required: true
-        type: string
+        type: number
     get:
       tags:
-        - app
-        - user
+        - driver
       security:
-        - ApplicationToken: []
-        - BusinessToken: []
-      description: |
-          Devuelve toda la información acerca de todos los viajes del usuario.
+        - UserToken: []
+      description: "Modificación de los datos de un conductor"
       responses:
         200:
-          description: Viajes del usuario
+          description: "Modificación correcta"
           schema:
             properties:
-              trips:
-                $ref: '#/definitions/Trip'
+              user:
+                $ref: "#/definitions/Drivers"
+        400:
+          description: "Incumplimiento de precondiciones (parámetros faltantes)"
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "No existe el recurso solicitado"
+          schema:
+            $ref: "#/definitions/Error"
         500:
           description: "Error inesperado"
           schema:
             $ref: "#/definitions/Error"
-      summary: Listado de viajes de un usuario
+      summary: "Actualización de información de un conductor"
   /trips:
-  	get:
+    get:
       tags:
         - user
       security:
-        - BusinessToken: []
-      description: |
-          Devuelve toda la información acerca de los viajes
+        - UserToken: []
+      description: "Devuelve toda la información acerca de todos los viajes"
       responses:
         200:
           description: "Todos los viajes indicados"
@@ -506,11 +657,11 @@ paths:
           schema:
             $ref: "#/definitions/Error"
       summary: "Listado de viajes"
-    post:
+    post:  # ------------------------------------------- NO ES INTERNO UNA VEZ QUE AMBOS DAN OK ????
       tags:
-        - app
+        - user 
       security:
-        - ApplicationToken: []
+        - UserToken: []
       description: "Dar de alta un viaje"
       parameters:
         - description: |
@@ -522,8 +673,8 @@ paths:
             properties:
               trip:
                 $ref: '#/definitions/Trip'
-              paymethod:
-                $ref: '#/definitions/PayMethod'
+              # paymethod:    FALTA DEFINIR
+              #   $ref: '#/definitions/PayMethod'
       responses:
         201:
           description: "Alta correcta"
@@ -541,19 +692,17 @@ paths:
             $ref: "#/definitions/Error"
       summary: "Dar de alta un viaje"
   /trips/{tripId}:
-  	parameters:
+    parameters:
       - description: "Identificador del viaje"
         in: path
         name: tripId
         required: true
-        type: string
+        type: number
     get:
       tags:
-        - app
         - user
       security:
-        - ApplicationToken: []
-        - BusinessToken: []
+        - UserToken: []
       description: "Devuelve toda la información del viaje"
       responses:
         200:
@@ -571,205 +720,163 @@ paths:
           schema:
             $ref: "#/definitions/Error"
       summary: "Obtener información de un viaje"
-  /trips/{tripId}/paths: #Estimativo, hay q ver como relacionarlo con la API de Google
-		get:
-      tags:
-        - user
-      security:
-        - BusinessToken: []
-      description: |
-          Devuelve los caminos recomendados
-      responses:
-        200:
-          description: "Todos los caminos recomendados"
-          schema:
-            properties:
-              paths:
-                $ref: "#/definitions/Path"
-        500:
-          description: "Unexpected error"
-          schema:
-            $ref: "#/definitions/Error"
-      summary: "Listado de caminos recomendados"
-  /trips/{tripId}/paths/{pathId}:
-  	parameters:
-      - description: "Identificador del viaje"
-        in: path
-        name: tripId
-        required: true
-        type: string
-      - description: "Identificador del camino"
-        in: path
-        name: pathId
-        required: true
-        type: string
-    get:
-      tags:
-        - app
-        - user
-      security:
-        - ApplicationToken: []
-        - BusinessToken: []
-      description: "Devuelve toda la información del camino sugerido"
-      responses:
-        200:
-          description: "Información del camino"
-          schema:
-            properties:
-              trip:
-                $ref: "#/definitions/Path"
-        404:
-          description: "Camino inexistente"
-          schema:
-            $ref: "#/definitions/Error"
-        500:
-          description: "Error inesperado"
-          schema:
-            $ref: "#/definitions/Error"
-      summary: "Obtener información de un camino sugerido"
-  /users/{userId}/location:
-  	parameters:
-      - description: "Identificador del usuario"
-        in: path
-        name: userId
-        required: true
-        type: string
-    get:
-      tags:
-        - app
-        - user
-      security:
-        - ApplicationToken: []
-        - BusinessToken: []
-      description: |
-          Devuelve toda la información acerca de la ubicación del usuario.
-      responses:
-        200:
-          description: Ubicación
-          schema:
-            properties:
-              cars:
-                $ref: '#/definitions/Location'
-        500:
-          description: "Error inesperado"
-          schema:
-            $ref: "#/definitions/Error"
-      summary: Ubicación de un usuario
-
-
-
-
-
-
+  
 definitions:
-	Id:
-	    type: string
-	    description: "Identificar univoco de la entidad"  
-	UsersData:
-		properties:
-			idUser:
-				type: $ref: '#/definitions/Id'
-				description: "id del usuario"
-			name:
-				type: string
-				decription: ""
-			lastName:
-				type: string
-				description: ""
-			userName:
-				type: string
-				decription: ""
-			email:
-				type: string
-				descrition: ""
-			location:
-				type: $ref: '#/definitions/Location'
-	Location:
-    	description: "Las coordenadas utilizan la especificación de [GeoJSON](https://geojson.org/geojson-spec.html#coordinate-reference-system-objects)donde `lon` es el primer número, mientras `lat` el segundo"
-	    properties:
-	      lat:
-	        type: number
-	      lon:
-	        type: number
-
-	Drivers:
-		properties:
-			personalData:
-				type: $ref: '#/definitions/UserData'
-				description: "id del usuario"
-			car:
-				type: $ref: '#/definitions/Car'
-				description: "id del usuario"
-			ranking:
-	Passengers:
-		properties:
-			personalData:
-				type: $ref: '#/definitions/UserData'
-				description: "id del usuario"
-			paymentData:
-	PaymentData:
-		properties:
-			cash:
-				type: bool
-				description: ""	
-			creditCard:
-				type: string
-				description: "id del usuario"
-	CreditCard:
-		properties:
-			carNumber:
-			securityNumber:
-			expirationDate:
-
-	Trip:
-		properties:
-			idTrip:
-			origin:
-			destiny:
-			cost:
-	Cost:
-		type:
-		description:
-	Car:
-		properties:
-		  Brand:
-	        type: string
-	        description: Marca
-	      Model:
-	        type: string
-	        description: Modelo
-	      Plate:
-	        type: string
-	        description: Patente
-	      Year:
-	        type: integer
-	        description: Año
-	      Color:
-	        type: string
-	        description: Color
-	      State:
-	        type: string
-	        description: Estado actual del automovil
-	      Radio:
-	        type: number
-	        description: Posee radio
-	      Music:
-	        type: bool
-	        description: Permite escuchar musica
-	      AirConditioning:
-	        type: bool
-	        description: Posee aire acondicionado
-	      Others:
-	        type: string
-	        description: Descripcion y/u otras caracterisicas opcionales
+  Id:
+      type: number
+      description: "Identificar univoco de la entidad"  
+  UsersData:
+    properties:
+      userId:
+          $ref: '#/definitions/Id'
+      name:
+        type: string
+      lastName:
+        type: string
+      credentials:
+          $ref: '#/definitions/UserCredentials'
+      location:
+          $ref: '#/definitions/Location'
+  UserCredentials:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+        format: password
+  Location:
+      description: "Las coordenadas utilizan la especificación de [GeoJSON](https://geojson.org/geojson-spec.html#coordinate-reference-system-objects)donde `lon` es el primer número, mientras `lat` el segundo"
+      properties:
+        lat:
+          type: number
+        lon:
+          type: number
+  Drivers:
+    properties:
+      personalData:
+          $ref: '#/definitions/UsersData'
+      car:
+          $ref: '#/definitions/Car'
+      # ranking:
+  Passengers:  # medio al pepe....
+    properties:
+      personalData:
+          $ref: '#/definitions/UsersData'
+      # paymentData:  poner o no??
+  PaymentData:
+    properties:
+      cash:
+        type: boolean
+        description: "Si el pasajero abona en efectivo. Solo moneda argentina (pesos)"  
+      creditCard:
+          $ref: '#/definitions/CreditCard'
+  CreditCard:
+    properties:
+      carNumber:
+        type: string
+        description: "Numero de tarjeta de credito como string"
+      # securityNumber:
+      #   type: ???
+      #   description: ""
+      expirationDate:
+        type: number # VER COM PONER DATETIM O SIMILAR
+        description: "fecha de vencimiento de la trajeta"
+  Trip:
+    description: "Viaje con su identificador. Ubicacion de origen, de fin y su costo estimado "
+    properties:
+      idTrip:
+          $ref: '#/definitions/Id'
+      origin:
+          $ref: '#/definitions/Location'
+      destiny:
+          $ref: '#/definitions/Location'
+      cost:
+          $ref: '#/definitions/Cost'
+  Cost:
+    type: number
+    description: "Costo estimativo del viaje"
+  Car:
+    properties:
+      Brand:
+        type: string
+        description: "Patente"
+      Model:
+        type: string
+        description: "Modelo"
+      Plate:
+        type: string
+        description: "Patente"
+      Year:
+        type: integer
+        description: "Año"
+      Color:
+        type: string
+        description: "Color"
+      State:
+        type: string
+        description: "Estado actual del automovil"
+      Radio:
+        type: number
+        description: "Posee radio"
+      # Music:
+      #   type: bool
+      #   description: "Permite escuchar musica"
+      # AirConditioning:
+      #   type: bool
+      #   description: "Posee aire acondicionado"
+      # Others:
+      #   type: string
+      #   description: "Descripcion y/u otras caracterisicas opcionales"
   Error:
-	  properties:
-	    code:
-	      format: int32
-	      type: integer
-	    message:
-	      type: string
-	  type: object
-
-
-
+    properties:
+      code:
+        format: int32
+        type: integer
+      message:
+        type: string
+    type: object
+  Timestamp:
+    type: number
+    description: "Tiempo en epoch"
+  Token:
+    properties:
+      expiresAt:
+        $ref: '#/definitions/Timestamp'
+      token:
+        type: string
+        description: Token de autenticación
+  # /trips/{tripId}/paths/{pathId}:  ----------------VER, SE CREA CADA UNO DE LOS PATH CON SOLO CONSULTAR ??? MMMM
+  #   parameters:
+  #     - description: "Identificador del viaje"
+  #       in: path
+  #       name: tripId
+  #       required: true
+  #       type: string
+  #     - description: "Identificador del camino"
+  #       in: path
+  #       name: pathId
+  #       required: true
+  #       type: string
+  #   get:
+  #     tags:
+  #       - app
+  #       - user
+  #     security:
+  #       - UserToken: []
+  #     description: "Devuelve toda la información del camino sugerido"
+  #     responses:
+  #       200:
+  #         description: "Información del camino"
+  #         schema:
+  #           properties:
+  #             trip:
+  #               $ref: "#/definitions/Path"
+  #       404:
+  #         description: "Camino inexistente"
+  #         schema:
+  #           $ref: "#/definitions/Error"
+  #       500:
+  #         description: "Error inesperado"
+  #         schema:
+  #           $ref: "#/definitions/Error"
+  #     summary: "Obtener información de un camino sugerido"
