@@ -297,7 +297,7 @@ paths:
           schema:
             $ref: "#/definitions/Error"
         409:
-          description: Conflicto en el update (esta mal el valor de `_ref`) #VER Q ES ESTO
+          description: Conflicto en el update (esta mal el valor de `_ref`) #VER Q ES ESTO-->algo de los tokens, los tokens tienen q coincidir (tienem q ser la misma version)
           schema:
             $ref: "#/definitions/Error"
         500:
