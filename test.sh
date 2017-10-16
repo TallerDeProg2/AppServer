@@ -1,4 +1,3 @@
-cd ./test
-py.test --cov=./
+PYTHONPATH=. py.test --cov=./src/main ./src/test
 cd ..
 mv ./test/.coverage .coverage
