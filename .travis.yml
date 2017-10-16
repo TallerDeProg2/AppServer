@@ -6,6 +6,6 @@ install:
   - pip install coveralls
   - pip install -r requirements.txt
 script:
-  - bash test.sh
+  - PYTHONPATH=. py.test --cov=./src/main ./src/test
 after_success:
   - coveralls
