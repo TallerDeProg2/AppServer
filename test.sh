@@ -1,3 +1,3 @@
 PYTHONPATH=. py.test --cov=./src/main ./src/test
 cd ..
-mv ./test/.coverage .coverage
+mv ./src/test/.coverage .coverage
