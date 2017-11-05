@@ -2,6 +2,7 @@ from flask import Flask
 from flask_restful import Resource, reqparse
 import requests
 from pymongo import MongoClient
+import logging
 
 app = Flask(__name__)
 parser = reqparse.RequestParser()
@@ -53,7 +54,7 @@ class SignUpUser(Resource):
         #     r.raise_for_status()
         # except requests.exception.HTTPError:
             #Ver si mandar error a alan o se manda solo
-        # return r.json(), 200
+        # return r.json()
         return args
 
 class SignUpPassenger(SignUpUser):
