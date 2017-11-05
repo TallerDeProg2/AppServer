@@ -2,7 +2,7 @@ import unittest
 
 import sys
 sys.path.append('../src')
-import HelloWorld as hw
+from src.main import HelloWorld as hw
 
 class TestHelloWorld(unittest.TestCase):
 
