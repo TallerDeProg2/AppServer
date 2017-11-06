@@ -1,5 +1,5 @@
-from src.main import authentication
-from src.main import edit
+# -*- coding: utf-8 -*-
+from src.main import authentication, edit, query
 from flask import Flask
 from flask_restful import Api
 
@@ -28,3 +28,4 @@ api.add_resource(authentication.HelloWorld, '/hola')
 api.add_resource(edit.EditPassenger, '/passengers/<string:id>')
 api.add_resource(authentication.SignUpPassenger, '/passengers')
 api.add_resource(authentication.SignUpDriver, '/drivers')
+api.add_resource(query.AvailableDrivers, '/passenger/<string:_id>/drivers')
