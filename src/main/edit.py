@@ -5,7 +5,6 @@ import jsonschema as js
 import logging
 
 app = Flask(__name__)
-parser = reqparse.RequestParser()
 
 
 class EditUser(Resource):
