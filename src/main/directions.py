@@ -44,6 +44,6 @@ class GetDirections(Resource):
         origin = str(origindb['lat']) + ',' + str(origindb['lon'])
         destiny = str(content['lat']) + ',' + str(content['lon'])
         # r = requests.get('https://maps.googleapis.com/maps/api/directions/json', params=content)
-        directions = gmaps.directions(origin, destiny) #ver como meterle las coordenadas
+        directions = gmaps.directions(origin, destiny)
 
         return directions
