@@ -1,6 +1,5 @@
 from unittest.mock import Mock, patch
 from nose.tools import assert_is_none, assert_list_equal
-from src.main import edit
 from src.main.paths import app #Para pegarle a mi server sin tener que abrirlo manualmente
 import requests
 import json
