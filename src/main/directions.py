@@ -18,7 +18,17 @@ drivers = db.drivers_test
 
 
 class GetDirections(Resource):
-    def get(self, id):
+    schema = {
+        'type': 'object',
+        'properties': {
+            'lat': {'type': 'number'},
+            'lon': {'type': 'number'},
+            'token': {'type': 'integer'}
+        },
+        'required': ['lat', 'lon', 'token']
+    }
+
+    def put(self, id):
         # validate_token(token, id) #Devuelve T o F, loggear
         content = request.json
         try:
@@ -27,11 +37,13 @@ class GetDirections(Resource):
             logging.error('Argumentos ingresados inválidos')
             abort(400)
 
-        origin = passengers.find({'id': id})
-        payload = {}
+        # origindb = passengers.find({'id': id})
+        origindb = {'lat': -34.5903345,
+                    'lon': -58.4161065}
 
-        payload['lat'] = origin['lat']
-
+        origin = str(origindb['lat']) + ',' + str(origindb['lon'])
+        destiny = str(content['lat']) + ',' + str(content['lon'])
         # r = requests.get('https://maps.googleapis.com/maps/api/directions/json', params=content)
-        directions_result = gmaps.directions("Sydney Town Hall",
-                                             "Parramatta, NSW") #ver como meterle las coordenadas
+        directions = gmaps.directions(origin, destiny) #ver como meterle las coordenadas
+
+        return directions
