@@ -4,6 +4,7 @@ import requests
 from pymongo import MongoClient
 import logging
 from src.main.edit import validate_args
+from src.main.global_method import encode_token
 
 app = Flask(__name__)
 parser = reqparse.RequestParser()
@@ -48,38 +49,49 @@ class LogIn(Resource):
             abort(r.status_code) # Por ahi podria pasarle el error q me manda ana a alan
                                  #Ver si mandar error a alan o se manda solo
         #Crear token
-        #token = encode_token(id)
-        #Crear usuario en database, con formato de db
-        # coll.insert_one('_id: 74748548, token: 8725889227')
-        #return r.json()
-        return content
+        token = encode_token(r.json()['id'])
+        return r.json()
+        # return content
 
 
 class SignUpUser(Resource):
-    # fields = ['username', 'password', 'fb.userID', 'fb.authToken', 'firstName', 'lastName',
-    #           'country', 'email', 'birthdate']
+    schema = {
+        'type': 'object',
+        'properties': {
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'fb': {
+                'type': 'object',
+                'properties': {
+                    'userID': {'type': 'string'},
+                    'authToken': {'type': 'string'}
+                },
+                'required': ['userID', 'authToken']
+            },
+            'firstName': {'type': 'string'},
+            'lastName': {'type': 'string'},
+            'country': {'type': 'string'},
+            'email': {'type': 'string'},
+            'birthdate': {'type': 'string'}
+        },
+        'required': ['username', 'password', 'fb', 'firstName', 'lastName',
+                     'country', 'email', 'birthdate']
+    }
 
     def post(self):
         """Permite registrar un usuario"""
-        for i in self.fields[:]:
-            parser.add_argument(i, type=str, required=True)
+        content = validate_args(self.schema)
 
-        args = parser.parse_args(strict=True)
+        try:
+            r = requests.post('direccionana/users', json=content)
+            r.raise_for_status()
+        except requests.exceptions.HTTPError:
+            logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
+            abort(r.status_code)
 
-        # try:
-        #     r = requests.post('direccionana/users', json=args)
-        #     r.raise_for_status()
-        # except requests.exception.HTTPError:
-            #Ver si mandar error a alan o se manda solo
+        # Crear usuario en database, con formato de db
+        # coll.insert_one('_id: 74748548, token: 8725889227')
+
         # return r.json()
-        return args
+        return content
 
-class SignUpPassenger(SignUpUser):
-    # fields = ['username', 'password', 'fb.userID', 'fb.authToken', 'firstName', 'lastName',
-    #           'country', 'email', 'birthdate']
-    fields = ['username', 'password']
-
-class SignUpDriver(SignUpUser):
-    # fields = ['username', 'password', 'fb.userID', 'fb.authToken', 'firstName', 'lastName',
-    #           'country', 'email', 'birthdate']
-    fields = ['username', 'password']

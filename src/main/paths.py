@@ -38,4 +38,5 @@ api.add_resource(edit.EditPayment, '/passengers/<string:id>/payment')
 
 api.add_resource(directions.GetDirections, '/passengers/<string:id>/directions')
 
-api.add_resource(query.AvailableDrivers, '/passenger/<string:_id>/drivers')
+# api.add_resource(query.AvailableDrivers, '/passenger/<string:_id>/drivers')
+api.add_resource(query.AvailableDrivers, '/passenger/drivers')
