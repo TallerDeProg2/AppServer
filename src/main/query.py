@@ -1,7 +1,9 @@
 from math import radians, cos, sin, asin, sqrt
+
+from bson.objectid import ObjectId
 from flask import Flask, request, jsonify
 from flask_restful import Resource
-from bson.objectid import ObjectId
+
 from src.main import global_method as gm
 from src.main import mongo as db
 
@@ -17,49 +19,24 @@ class AvailableDrivers(Resource):
             # LOG INFO - correct token
             passenger = db.passengers.find_one({'_id': ObjectId(_id)})
 
-            # TODO: Handle passenger not found
-            # if passenger == None:
-            #   response 404, notifyError(), throwException(), something()...
+            if not passenger:
+                # LOG ERROR - _id inexistente
+                return jsonify({"RESPONSE": "error"})
 
-            self._update_location(passenger)
             repuesta = self._get_drivers_cercanos(passenger)
-
-            # r = requests.put('direccionana/users/' + id, json=r)
-            # r.raise_for_status()
 
             return jsonify({"RESPONSE": repuesta, "token": token})
         else:
             # LOG ERROR - incorrect token
             return jsonify({"RESPONSE": "error"})
 
-    def _get_actual_location(self, passenger):
-        lat_passenger = request.args.get('lat')
-        lon_passenger = request.args.get('lon')
-
-        if (not lat_passenger or not lon_passenger) and (not passenger['lat'] or not passenger['lon']):
-            # LOG ERROR - no existe ubicacion
-            return jsonify({"RESPONSE": "no tiene posicion de inicio"})
-        if not lat_passenger or not lon_passenger:
-            # LOG WARNING - ultimo origen registrado
-            return passenger['lat'], passenger['lon']
-        return request.args.get('lat'), request.args.get('lon')
-
-    def _update_location(self, passenger):  # DEBERIA SER [GLOBAL]
-        """
-            Set de concurrent location of user in database
-        :param passenger:
-        :return:
-        """
-        lat, lon = self._get_actual_location(passenger)
-        db.passengers.find_one_and_update({"_id": passenger['_id']},
-                                       {'$set': {"lat": lat, 'lon': lon}})
-
-    def _calculate_distance(self, passenger, londriver, latdriver):
+    def _calculate_distance(self, passenger, driver):
         """
             Calculate the great circle distance between two points
             on the earth (specified in decimal degrees)
         """
         # convert decimal degrees to radians
+        londriver, latdriver = driver['lon'], driver['lat']
         lon_p, lat_p, lon_d, lat_d = map(radians, [int(passenger['lon'])
             , int(passenger['lat']), int(londriver), int(latdriver)])
         lon_distance = lon_d - lon_p
@@ -71,15 +48,16 @@ class AvailableDrivers(Resource):
         # return km
         return int(londriver) + int(latdriver)
 
-    def _esta_cerca(self, passenger, londriver, latdriver):
+    def _esta_cerca(self, passenger, driver):
         max_distance = 25  # DEBERIA SETEARLA EL PASSENGER
-        if self._calculate_distance(passenger, londriver, latdriver) < max_distance:
+        if self._calculate_distance(passenger, driver) < max_distance:
             return True
         return False
 
     def _get_drivers_cercanos(self, passenger):
         cercanos = []
-        for x in db.drivers.find():
-            if self._esta_cerca(passenger, x['lon'], x['lat']):
-                cercanos.append({'lon': x['lon'], 'lat': x['lat']})
+        for x in db.drivers.find({},{'_id':0 , 'lat': 1, 'lon': 1}):
+            # print("conductor: ", x)
+            if self._esta_cerca(passenger, x):
+                cercanos.append(x)
         return cercanos
