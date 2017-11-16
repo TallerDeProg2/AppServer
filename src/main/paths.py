@@ -29,8 +29,7 @@ api = Api(app, errors=errors)
 
 api.add_resource(authentication.LogIn, '/')
 api.add_resource(authentication.HelloWorld, '/hola')
-api.add_resource(authentication.SignUpPassenger, '/passengers')
-api.add_resource(authentication.SignUpDriver, '/drivers')
+api.add_resource(authentication.SignUpUser, '/users')
 
 api.add_resource(edit.EditUser, '/passengers/<string:id>')
 api.add_resource(edit.EditCar, '/driver/<string:id>/cars')

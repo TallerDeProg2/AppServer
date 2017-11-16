@@ -14,6 +14,17 @@ db = client.baseprueba
 coll = db.baseprueba
 
 
+def send_post(endpoint, content):
+    try:
+        r = requests.post(endpoint, json=content)
+        r.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
+        abort(r.status_code)
+
+    return r.json()
+
+
 class HelloWorld(Resource):
     def get(self):
         return "Hola"
@@ -41,16 +52,12 @@ class LogIn(Resource):
         """Permite loggear un usuario"""
         content = validate_args(self.schema)
 
-        try:
-            r = requests.post('direccionana/users/validate', json=content)
-            r.raise_for_status()
-        except requests.exceptions.HTTPError:
-            logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
-            abort(r.status_code) # Por ahi podria pasarle el error q me manda ana a alan
-                                 #Ver si mandar error a alan o se manda solo
+        r = send_post('direccionana/users/validate', content)
+
         #Crear token
-        token = encode_token(r.json()['id'])
-        return r.json()
+        token = encode_token(r['id'])
+        r['token'] = token
+        return r, 200
         # return content
 
 
@@ -82,16 +89,11 @@ class SignUpUser(Resource):
         """Permite registrar un usuario"""
         content = validate_args(self.schema)
 
-        try:
-            r = requests.post('direccionana/users', json=content)
-            r.raise_for_status()
-        except requests.exceptions.HTTPError:
-            logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
-            abort(r.status_code)
+        r = send_post('direccionana/users', content)
 
         # Crear usuario en database, con formato de db
-        # coll.insert_one('_id: 74748548, token: 8725889227')
+        coll.insert_one({'_id': r['id'], 'lat': '', 'long': ''})
 
-        # return r.json()
-        return content
+        # return r, 201
+        return content, 201
 
