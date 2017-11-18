@@ -22,6 +22,10 @@ errors = {
     'InternalServerError': {
         'message': "Error inesperado",
         'status': 500
+    },
+    'Unauthorized': {
+        'message': "No autorizado",
+        'status': 401
     }
 }
 
