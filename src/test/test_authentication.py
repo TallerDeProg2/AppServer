@@ -55,7 +55,6 @@ class TestAuthentication(unittest.TestCase):
             'id': '383948'
         }]
 
-        # mock_encode.return_value = Mock()
         mock_encode.return_value = '74284297428'
 
         mock_post.return_value = Mock(ok=True)
