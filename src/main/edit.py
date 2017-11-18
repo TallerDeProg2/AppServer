@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse, abort
 import requests
 import jsonschema as js
 import logging
+import src.main.global_method as gm
 
 app = Flask(__name__)
 
@@ -18,22 +19,14 @@ def validate_args(schema):
     return content
 
 
-def send_edit(endpoint, content):
-    r = requests.get(endpoint).json()
-    content['_ref'] = r['_ref']
-
-    try:
-        r = requests.put(endpoint, json=content)
-        r.raise_for_status()
-    except requests.exceptions.HTTPError:
-        logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
-        abort(r.status_code)  # Por ahi podria pasarle el error q me manda ana a alan
-
-    return r.json()
+def validate_token(id):
+    token = request.headers['token'] #Ver si esto bien o mal
+    if not gm.validate_token(token, id):
+        logging.error('Token inválido')
+        abort(401)
 
 
-
-class EditUser(Resource):
+class Edit(Resource):
     schema = {
         'type': 'object',
         'properties': {
@@ -56,31 +49,53 @@ class EditUser(Resource):
         'required': ['username', 'password', 'fb', 'firstName', 'lastName',
                      'country', 'email', 'birthdate']
     }
+    url = 'direccionana/'
+    endpoint = ''
 
     def put(self, id):
-        """Permite modificar un usuario"""
-        #validate_token(token, id) #Devuelve T o F, loggear
-        content = request.json
-        try:
-            js.validate(content, self.schema)
-        except js.exceptions.ValidationError:
-            logging.error('Argumentos ingresados inválidos')
-            abort(400)
-
-        r = requests.get('direccionana/users/' + id).json()
+        """Permite modificar"""
+        validate_token(id)
+        content = validate_args(self.schema)
+        r = requests.get(self.url + id + self.endpoint).json()
         content['_ref'] = r['_ref']
 
         try:
-            r = requests.put('direccionana/users/' + id, json=content)
+            r = requests.put(self.url + id + self.endpoint, json=content)
             r.raise_for_status()
         except requests.exceptions.HTTPError:
             logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
-            abort(r.status_code) # Por ahi podria pasarle el error q me manda ana a alan
+            abort(r.status_code)
 
         return r.json()
 
 
-class EditCar(Resource):
+class EditUser(Edit):
+    schema = {
+        'type': 'object',
+        'properties': {
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'fb': {
+                'type': 'object',
+                'properties': {
+                    'userID': {'type': 'string'},
+                    'authToken': {'type': 'string'}
+                },
+                'required': ['userID', 'authToken']
+            },
+            'firstName': {'type': 'string'},
+            'lastName': {'type': 'string'},
+            'country': {'type': 'string'},
+            'email': {'type': 'string'},
+            'birthdate': {'type': 'string'}
+        },
+        'required': ['username', 'password', 'fb', 'firstName', 'lastName',
+                     'country', 'email', 'birthdate']
+    }
+    url = 'direccionana/users/'
+
+
+class EditCar(Edit):
     schema = {
         'type': 'object',
         'properties': {
@@ -96,15 +111,11 @@ class EditCar(Resource):
         'required': ['brand', 'model', 'color', 'plate', 'year',
                      'status', 'radio', 'airconditioner']
     }
-
-    def put(self, id):
-        """Permite modificar un auto"""
-        # validate_token(token, id) #Devuelve T o F, loggear
-        content = validate_args(self.schema)
-        send_edit('direccionana/driver/' + id + '/cars', content)
+    url = 'direccionana/driver/'
+    endpoint = '/cars'
 
 
-class EditPayment(Resource):
+class EditPayment(Edit):
     schema = {
         'type': 'object',
         'properties': {
@@ -116,9 +127,5 @@ class EditPayment(Resource):
         },
         'required': ['name', 'number', 'type', 'expirationMonth', 'expirationYear']
     }
-
-    def put(self, id):
-        """Permite modificar los datos de pago"""
-        # validate_token(token, id) #Devuelve T o F, loggear
-        content = validate_args(self.schema)
-        send_edit('direccionana/passenger/' + id + '/payment', content) # Chequear endpoint con ana
+    url = 'direccionana/passenger/'
+    endpoint = '/payment'

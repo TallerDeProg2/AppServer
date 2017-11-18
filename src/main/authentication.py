@@ -4,13 +4,26 @@ import requests
 from pymongo import MongoClient
 import logging
 from src.main.edit import validate_args
+import src.main.global_method as gm
 
 app = Flask(__name__)
 parser = reqparse.RequestParser()
 
-client = MongoClient('localhost', 27017)
-db = client.baseprueba
-coll = db.baseprueba
+client = MongoClient('mongodb://sofafafa:sofafafa1@ds141098.mlab.com:41098/ubre')
+db = client['ubre']
+drivers_db = db['drivers_test']
+passengers_db = db['passengers_test']
+
+
+def send_post(endpoint, content):
+    try:
+        r = requests.post(endpoint, json=content)
+        r.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
+        abort(r.status_code)
+
+    return r.json()
 
 
 class HelloWorld(Resource):
@@ -40,46 +53,51 @@ class LogIn(Resource):
         """Permite loggear un usuario"""
         content = validate_args(self.schema)
 
-        try:
-            r = requests.post('direccionana/users/validate', json=content)
-            r.raise_for_status()
-        except requests.exceptions.HTTPError:
-            logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
-            abort(r.status_code) # Por ahi podria pasarle el error q me manda ana a alan
-                                 #Ver si mandar error a alan o se manda solo
+        r = send_post('direccionana/users/validate', content)
+
         #Crear token
-        #token = encode_token(id)
-        #Crear usuario en database, con formato de db
-        # coll.insert_one('_id: 74748548, token: 8725889227')
-        #return r.json()
-        return content
+        token = gm.encode_token(r['id'])
+        r['token'] = token
+        return r, 200
+        # return content
 
 
 class SignUpUser(Resource):
-    # fields = ['username', 'password', 'fb.userID', 'fb.authToken', 'firstName', 'lastName',
-    #           'country', 'email', 'birthdate']
+    schema = {
+        'type': 'object',
+        'properties': {
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'fb': {
+                'type': 'object',
+                'properties': {
+                    'userID': {'type': 'string'},
+                    'authToken': {'type': 'string'}
+                },
+                'required': ['userID', 'authToken']
+            },
+            'firstName': {'type': 'string'},
+            'lastName': {'type': 'string'},
+            'country': {'type': 'string'},
+            'email': {'type': 'string'},
+            'birthdate': {'type': 'string'}
+        },
+        'required': ['username', 'password', 'fb', 'firstName', 'lastName',
+                     'country', 'email', 'birthdate']
+    }
 
     def post(self):
         """Permite registrar un usuario"""
-        for i in self.fields[:]:
-            parser.add_argument(i, type=str, required=True)
+        content = validate_args(self.schema)
 
-        args = parser.parse_args(strict=True)
+        r = send_post('direccionana/users', content)
 
-        # try:
-        #     r = requests.post('direccionana/users', json=args)
-        #     r.raise_for_status()
-        # except requests.exception.HTTPError:
-            #Ver si mandar error a alan o se manda solo
-        # return r.json()
-        return args
+        if r['type'] == 'passenger':
+            passengers_db.insert_one({'_id': r['id'], 'lat': '', 'long': ''})
+        # passengers_db.insert_one({'_id': '238932', 'lat': '', 'long': ''})
+        else:
+            drivers_db.insert_one({'_id': r['id'], 'lat': '', 'long': ''})
 
-class SignUpPassenger(SignUpUser):
-    # fields = ['username', 'password', 'fb.userID', 'fb.authToken', 'firstName', 'lastName',
-    #           'country', 'email', 'birthdate']
-    fields = ['username', 'password']
+        return r, 201
+        # return content, 201
 
-class SignUpDriver(SignUpUser):
-    # fields = ['username', 'password', 'fb.userID', 'fb.authToken', 'firstName', 'lastName',
-    #           'country', 'email', 'birthdate']
-    fields = ['username', 'password']
