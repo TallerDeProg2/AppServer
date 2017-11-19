@@ -31,6 +31,11 @@ class HelloWorld(Resource):
         return "Hola"
 
 
+class ByeWorld(Resource):
+    def get(self):
+        return "Chau"
+
+
 class LogIn(Resource):
     schema = {
         'type': 'object',
