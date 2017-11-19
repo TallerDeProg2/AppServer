@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
+import logging
 from math import radians, cos, sin, asin, sqrt
 
-from bson.objectid import ObjectId
-from flask import Flask, request, jsonify
-from flask_restful import Resource
+import requests
+from flask import Flask, request, jsonify, make_response
+from flask_restful import Resource, abort
 
 from src.main import global_method as gm
 from src.main import mongo as db
@@ -11,24 +13,26 @@ app = Flask(__name__)
 
 
 class AvailableDrivers(Resource):
-    def get(self, _id):
-        # LOG INFO - get choferes disponibles
+    def get(self, id):
+        logging.info("get AvailableDrivers")
         token = request.headers['token']
 
         if gm.validate_token(token):
-            # LOG INFO - correct token
-            passenger = db.passengers.find_one({'_id': ObjectId(_id)})
+            logging.info("token correcto")
+            passenger = db.passengers.find_one({'id': id})
+            # passenger = db.passengers.find_one({'_id': ObjectId(_id)})
 
             if not passenger:
-                # LOG ERROR - _id inexistente
-                return jsonify({"RESPONSE": "error"})
+                # es que no esta conectado porque no esta en nueestra base
+                logging.error('Id inexistente')
+                abort(404)
 
             repuesta = self._get_drivers_cercanos(passenger)
 
-            return jsonify({"RESPONSE": repuesta, "token": token})
+            return make_response(jsonify(RESPONSE=repuesta, token=token), 200)
         else:
-            # LOG ERROR - incorrect token
-            return jsonify({"RESPONSE": "error"})
+            logging.error('Token invalido')
+            abort(401)
 
     def _calculate_distance(self, passenger, driver):
         """
@@ -56,8 +60,21 @@ class AvailableDrivers(Resource):
 
     def _get_drivers_cercanos(self, passenger):
         cercanos = []
-        for x in db.drivers.find({},{'_id':0 , 'lat': 1, 'lon': 1}):
-            # print("conductor: ", x)
+        for x in db.drivers.find({}, {'_id': 0, 'token': 0}):
             if self._esta_cerca(passenger, x):
+                # todo ver el tema del id _id si tenemos los dos y no mostramos el dafault de mongo o que ondis
+                # r = self._get_data_user(x['id'])
+                # cercanos.append(jsonify(driver=r, position={'lat': x['lat'], 'lon': x['lon']}))
                 cercanos.append(x)
         return cercanos
+
+    def _get_data_user(self, id):
+        try:
+            # todo hacer global el dominio de ana y apendearlo antes del endpoint
+            r = requests.get('users/' + id, headers={'token': "alguntokenguardado"})
+            # todo le tengo que mandar el token por header
+            r.raise_for_status()
+        except requests.exceptions.HTTPError:
+            logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
+            abort(r.status_code)
+        return r
