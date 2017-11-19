@@ -26,6 +26,7 @@ class AvailableDrivers(Resource):
                 # es que no esta conectado porque no esta en nueestra base
                 logging.error('Id inexistente')
                 abort(404)
+                return  #todo test no me pasa si no hago el return why?
 
             repuesta = self._get_drivers_cercanos(passenger)
 
