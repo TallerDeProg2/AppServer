@@ -86,14 +86,16 @@ class TestQuery(unittest.TestCase):
 
             mock_abort.assert_called_with(401)
 
+    @patch('src.main.mongo.passengers')
     @patch('src.main.query.abort')
     @patch('src.main.global_method.validate_token', return_value=True)
     @patch('src.main.query.request')
-    def test_incorrect_id(self, mock_request, mock_gm, mock_abort):
+    def test_incorrect_id(self, mock_request, mock_gm, mock_abort, mock_mongo):
         with app.app_context():
             service = AvailableDrivers()
 
             mock_request.headers.return_value = {"token": 1}
+            mock_mongo.find_one.return_value = False
             # mock_abort.side_effect = mocked_abort
             service.get("2")
 

@@ -24,7 +24,6 @@ class AvailableDrivers(Resource):
 
             if passenger:
                 repuesta = self._get_drivers_cercanos(passenger)
-
                 return make_response(jsonify(RESPONSE=repuesta, token=token), 200)
 
             logging.error('Id inexistente/no conectado')
