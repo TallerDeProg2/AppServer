@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from flask_restful import Resource
 from bson.objectid import ObjectId
 from src.main import global_method as gm
-from src.main import mongo as db
+from src.main import mongo_spec as db
 
 app = Flask(__name__)
 

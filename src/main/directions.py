@@ -2,19 +2,13 @@ from flask import Flask, request
 from flask_restful import Resource, abort
 import jsonschema as js
 import logging
-import requests
-from pymongo import MongoClient
+import src.main.mongo_spec as db
 import googlemaps
 
 
 app = Flask(__name__)
 
 gmaps = googlemaps.Client(key='AIzaSyBwLajy8yXPyJ3QjXT-QcBqRDFSEj5_Acs')
-client = MongoClient('mongodb://aybl:93731a@ds113775.mlab.com:13775/ubre_users', 27017)
-
-db = client.ubre_users
-passengers = db.passengers_test
-drivers = db.drivers_test
 
 
 class GetDirections(Resource):
@@ -37,13 +31,12 @@ class GetDirections(Resource):
             logging.error('Argumentos ingresados inválidos')
             abort(400)
 
-        # origindb = passengers.find({'id': id})
-        origindb = {'lat': -34.5903345,
-                    'long': -58.4161065}
+        origindb = db.passengers.find({'_id': id})
+        # origindb = {'lat': -34.5903345,
+        #             'long': -58.4161065}
 
         origin = str(origindb['lat']) + ',' + str(origindb['long'])
         destiny = str(content['lat']) + ',' + str(content['long'])
-        # r = requests.get('https://maps.googleapis.com/maps/api/directions/json', params=content)
         directions = gmaps.directions(origin, destiny)
 
         return directions

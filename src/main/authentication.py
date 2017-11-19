@@ -1,18 +1,13 @@
 from flask import Flask
 from flask_restful import Resource, reqparse, abort
 import requests
-from pymongo import MongoClient
 import logging
 from src.main.edit import validate_args
 import src.main.global_method as gm
+import src.main.mongo_spec as db
 
 app = Flask(__name__)
 parser = reqparse.RequestParser()
-
-client = MongoClient('mongodb://sofafafa:sofafafa1@ds141098.mlab.com:41098/ubre')
-db = client['ubre']
-drivers_db = db['drivers_test']
-passengers_db = db['passengers_test']
 
 
 def send_post(endpoint, content):
@@ -98,10 +93,10 @@ class SignUpUser(Resource):
         r = send_post('direccionana/users', content)
 
         if r['type'] == 'passenger':
-            passengers_db.insert_one({'_id': r['id'], 'lat': '', 'long': ''})
-        # passengers_db.insert_one({'_id': '238932', 'lat': '', 'long': ''})
+            db.passengers.insert_one({'_id': r['id'], 'lat': '', 'long': ''})
+        # db.passengers.insert_one({'_id': '238932', 'lat': '', 'long': ''})
         else:
-            drivers_db.insert_one({'_id': r['id'], 'lat': '', 'long': ''})
+            db.drivers.insert_one({'_id': r['id'], 'lat': '', 'long': ''})
 
         return r, 201
         # return content, 201
