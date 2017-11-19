@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from src.main import authentication, edit, query, directions
+from src.main import authentication, edit, query, directions, location
 from flask import Flask
 from flask_restful import Api
 import logging
@@ -39,6 +39,8 @@ api.add_resource(authentication.SignUpUser, '/users')
 api.add_resource(edit.EditUser, '/passengers/<string:id>')
 api.add_resource(edit.EditCar, '/driver/<string:id>/cars')
 api.add_resource(edit.EditPayment, '/passengers/<string:id>/payment')
+
+api.add_resource(location.LocatePassenger, '/passengers/<string:id>/location')
 
 api.add_resource(directions.GetDirections, '/passengers/<string:id>/directions')
 
