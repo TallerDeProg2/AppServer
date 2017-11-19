@@ -41,6 +41,7 @@ api.add_resource(edit.EditCar, '/driver/<string:id>/cars')
 api.add_resource(edit.EditPayment, '/passengers/<string:id>/payment')
 
 api.add_resource(location.LocatePassenger, '/passengers/<string:id>/location')
+api.add_resource(location.LocateDriver, '/drivers/<string:id>/location')
 
 api.add_resource(directions.GetDirections, '/passengers/<string:id>/directions')
 
