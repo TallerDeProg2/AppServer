@@ -48,8 +48,6 @@ def mocked_make_response(*args, **kwargs):
 
 class TestQuery(unittest.TestCase):
     # test del endpoint
-    # test de del los metodos
-    # test de mockear a ana
 
     # @patch('src.main.query.make_response', side_effect=mocked_make_response)
     # @patch('src.main.mongo.drivers')
@@ -84,6 +82,19 @@ class TestQuery(unittest.TestCase):
             service.get("2")
 
             mock_abort.assert_called_with(401)
+
+    @patch('src.main.query.abort')
+    @patch('src.main.global_method.validate_token', return_value=True)
+    @patch('src.main.query.request')
+    def test_incorrect_id(self, mock_request, mock_gm, mock_abort):
+        with app.app_context():
+            service = AvailableDrivers()
+
+            mock_request.headers.return_value = {"token": 1}
+
+            service.get("2")
+
+            mock_abort.assert_called_with(404)
 
     @patch('src.main.mongo.drivers')
     def test_get_drivers_cercanos(self, mock_mongoD):
