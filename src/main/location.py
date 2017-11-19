@@ -13,7 +13,7 @@ def update_location(schema, collection, id): #Ver si conviene esto o herencia
 
     collection.update_one({'_id': id},
                              {'$set': {
-                                 'long': content['long'],
+                                 'lon': content['lon'],
                                  'lat': content['lat']
                              }})
 
@@ -23,9 +23,9 @@ class LocatePassenger(Resource):
         'type': 'object',
         'properties': {
             'lat': {'type': 'number'},
-            'long': {'type': 'number'}
+            'lon': {'type': 'number'}
         },
-        'required': ['lat', 'long']
+        'required': ['lat', 'lon']
     }
 
     def put(self, id):
@@ -38,9 +38,9 @@ class LocateDriver(Resource):
         'type': 'object',
         'properties': {
             'lat': {'type': 'number'},
-            'long': {'type': 'number'}
+            'lon': {'type': 'number'}
         },
-        'required': ['lat', 'long']
+        'required': ['lat', 'lon']
     }
 
     def put(self, id):

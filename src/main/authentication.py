@@ -93,10 +93,10 @@ class SignUpUser(Resource):
         r = send_post('direccionana/users', content)
 
         if r['type'] == 'passenger':
-            db.passengers.insert_one({'_id': r['id'], 'lat': '', 'long': ''})
-        # db.passengers.insert_one({'_id': '238932', 'lat': '', 'long': ''})
+            db.passengers.insert_one({'_id': r['id'], 'lat': '', 'lon': ''})
+        # db.passengers.insert_one({'_id': '238932', 'lat': '', 'lon': ''})
         else:
-            db.drivers.insert_one({'_id': r['id'], 'lat': '', 'long': ''})
+            db.drivers.insert_one({'_id': r['id'], 'lat': '', 'lon': ''})
 
         return r, 201
         # return content, 201

@@ -33,10 +33,10 @@ class GetDirections(Resource):
 
         origindb = db.passengers.find({'_id': id})
         # origindb = {'lat': -34.5903345,
-        #             'long': -58.4161065}
+        #             'lon': -58.4161065}
 
-        origin = str(origindb['lat']) + ',' + str(origindb['long'])
-        destiny = str(content['lat']) + ',' + str(content['long'])
+        origin = str(origindb['lat']) + ',' + str(origindb['lon'])
+        destiny = str(content['lat']) + ',' + str(content['lon'])
         directions = gmaps.directions(origin, destiny)
 
         return directions
