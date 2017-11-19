@@ -1,15 +1,10 @@
 from flask import Flask
 from flask_restful import Resource
-from pymongo import MongoClient
 from src.main.edit import validate_token, validate_args
+import src.main.mongo_spec as db
 
 
 app = Flask(__name__)
-
-client = MongoClient('mongodb://sofafafa:sofafafa1@ds141098.mlab.com:41098/ubre')
-db = client['ubre']
-drivers_db = db['drivers_test']
-passengers_db = db['passengers_test']
 
 
 def update_location(schema, collection, id): #Ver si conviene esto o herencia
@@ -18,7 +13,7 @@ def update_location(schema, collection, id): #Ver si conviene esto o herencia
 
     collection.update_one({'_id': id},
                              {'$set': {
-                                 'long': content['long'],
+                                 'lon': content['lon'],
                                  'lat': content['lat']
                              }})
 
@@ -28,13 +23,13 @@ class LocatePassenger(Resource):
         'type': 'object',
         'properties': {
             'lat': {'type': 'number'},
-            'long': {'type': 'number'}
+            'lon': {'type': 'number'}
         },
-        'required': ['lat', 'long']
+        'required': ['lat', 'lon']
     }
 
     def put(self, id):
-        update_location(self.schema, passengers_db, id)
+        update_location(self.schema, db.passengers, id)
         return 200
 
 
@@ -43,13 +38,13 @@ class LocateDriver(Resource):
         'type': 'object',
         'properties': {
             'lat': {'type': 'number'},
-            'long': {'type': 'number'}
+            'lon': {'type': 'number'}
         },
-        'required': ['lat', 'long']
+        'required': ['lat', 'lon']
     }
 
     def put(self, id):
-        update_location(self.schema, drivers_db, id)
+        update_location(self.schema, db.drivers, id)
         return 200
 
 

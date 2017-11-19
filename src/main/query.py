@@ -7,7 +7,7 @@ from flask import Flask, request, jsonify, make_response
 from flask_restful import Resource, abort
 
 from src.main import global_method as gm
-from src.main import mongo as db
+from src.main import mongo_spec as db
 
 app = Flask(__name__)
 
