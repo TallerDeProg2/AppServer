@@ -38,6 +38,9 @@ def mocked_requests_get(*args, **kwargs):
 
     return MockResponse(None, 404)
 
+def mocked_abort(*args, **kwargs):
+    raise requests.exceptions.HTTPError
+
 def mocked_make_response(*args, **kwargs):
     class MockResponse:
         def __init__(self, json_data, status_code):
@@ -91,7 +94,7 @@ class TestQuery(unittest.TestCase):
             service = AvailableDrivers()
 
             mock_request.headers.return_value = {"token": 1}
-
+            # mock_abort.side_effect = mocked_abort
             service.get("2")
 
             mock_abort.assert_called_with(404)

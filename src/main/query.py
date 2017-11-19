@@ -22,15 +22,14 @@ class AvailableDrivers(Resource):
             passenger = db.passengers.find_one({'id': id})
             # passenger = db.passengers.find_one({'_id': ObjectId(_id)})
 
-            if not passenger:
-                # es que no esta conectado porque no esta en nueestra base
-                logging.error('Id inexistente')
-                abort(404)
-                return  #todo test no me pasa si no hago el return why?
+            if passenger:
+                repuesta = self._get_drivers_cercanos(passenger)
 
-            repuesta = self._get_drivers_cercanos(passenger)
+                return make_response(jsonify(RESPONSE=repuesta, token=token), 200)
 
-            return make_response(jsonify(RESPONSE=repuesta, token=token), 200)
+            logging.error('Id inexistente/no conectado')
+            abort(404)
+
         else:
             logging.error('Token invalido')
             abort(401)
