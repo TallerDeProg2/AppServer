@@ -22,10 +22,10 @@ class GetDirections(Resource):
         'type': 'object',
         'properties': {
             'lat': {'type': 'number'},
-            'lon': {'type': 'number'},
+            'long': {'type': 'number'},
             'token': {'type': 'integer'}
         },
-        'required': ['lat', 'lon', 'token']
+        'required': ['lat', 'long', 'token']
     }
 
     def put(self, id):
@@ -39,10 +39,10 @@ class GetDirections(Resource):
 
         # origindb = passengers.find({'id': id})
         origindb = {'lat': -34.5903345,
-                    'lon': -58.4161065}
+                    'long': -58.4161065}
 
-        origin = str(origindb['lat']) + ',' + str(origindb['lon'])
-        destiny = str(content['lat']) + ',' + str(content['lon'])
+        origin = str(origindb['lat']) + ',' + str(origindb['long'])
+        destiny = str(content['lat']) + ',' + str(content['long'])
         # r = requests.get('https://maps.googleapis.com/maps/api/directions/json', params=content)
         directions = gmaps.directions(origin, destiny)
 
