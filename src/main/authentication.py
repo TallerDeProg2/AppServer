@@ -12,7 +12,7 @@ parser = reqparse.RequestParser()
 
 def send_post(endpoint, content):
     try:
-        r = requests.post(endpoint, json=content)
+        r = requests.post(endpoint, json=content, headers={'token': ''})
         r.raise_for_status()
     except requests.exceptions.HTTPError:
         logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
@@ -92,7 +92,7 @@ class SignUpUser(Resource):
 
         r = send_post('direccionana/users', content)
 
-        if r['type'] == 'passenger':
+        if content['type'] == 'passenger':
             db.passengers.insert_one({'_id': r['id'], 'lat': '', 'lon': ''})
         # db.passengers.insert_one({'_id': '238932', 'lat': '', 'lon': ''})
         else:
