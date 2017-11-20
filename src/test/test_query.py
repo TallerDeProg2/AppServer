@@ -86,7 +86,7 @@ class TestQuery(unittest.TestCase):
 
             mock_abort.assert_called_with(401)
 
-    @patch('src.main.mongo_spec.passengers')
+    @patch('src.main.constants.mongo_spec.passengers')
     @patch('src.main.query.abort')
     @patch('src.main.global_method.validate_token', return_value=True)
     @patch('src.main.query.request')
@@ -101,7 +101,7 @@ class TestQuery(unittest.TestCase):
 
             mock_abort.assert_called_with(404)
 
-    @patch('src.main.mongo_spec.drivers')
+    @patch('src.main.constants.mongo_spec.drivers')
     def test_get_drivers_cercanos(self, mock_mongoD):
         with app.app_context():
             service = AvailableDrivers()
@@ -138,7 +138,7 @@ if __name__ == '__main__':
 
 # ---------------------------------------------------
 # class TestQuery(unittest.TestCase):
-#     # @patch('src.main.mongo_spec')
+#     # @patch('src.main.constants.mongo_spec')
 #     # @patch('src.main.query.jsonify')
 #     # @patch('src.main.global_method.validate_token', return_value=False)
 #     # @patch('src.main.query.request')
