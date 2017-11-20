@@ -28,7 +28,7 @@ errors = {
         'status': 401
     }
 }
-
+#TODO generalizar los endpoints con plural o singular
 api = Api(app, errors=errors)
 
 api.add_resource(authentication.LogIn, '/')
@@ -45,5 +45,5 @@ api.add_resource(location.LocateDriver, '/drivers/<string:id>/location')
 
 api.add_resource(directions.GetDirections, '/passengers/<string:id>/directions')
 
-# api.add_resource(query.AvailableDrivers, '/passenger/<string:_id>/drivers')
-api.add_resource(query.AvailableDrivers, '/passenger/drivers')
+api.add_resource(query.AvailableDrivers, '/passengers/<string:id>/drivers')
+api.add_resource(query.AvailableTrips, '/drivers/<string:id>/trips')
