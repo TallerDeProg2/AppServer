@@ -11,11 +11,12 @@ def update_location(schema, collection, id): #Ver si conviene esto o herencia
     # validate_token(id)
     content = validate_args(schema)
 
-    collection.update_one({'_id': id},
-                             {'$set': {
+    collection.update_one({'_id': id}, {
+                            '$set': {
                                  'lon': content['lon'],
                                  'lat': content['lat']
-                             }})
+                                 }
+                            })
 
 
 class LocatePassenger(Resource):

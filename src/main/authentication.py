@@ -14,10 +14,11 @@ parser = reqparse.RequestParser()
 
 def send_post(endpoint, content):
     try:
-        r = requests.post(endpoint, json=content, headers={'token': ''})
+        r = requests.post(endpoint, json=content, headers={'token': 'superservercito-token'})
         r.raise_for_status()
     except requests.exceptions.HTTPError:
         logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
+        logging.error('     Mensaje: ' + r.content.decode('utf-8', 'ignore'))
         abort(r.status_code)
 
     return r.json()
@@ -68,23 +69,24 @@ class SignUpUser(Resource):
     schema = {
         'type': 'object',
         'properties': {
+            'type': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'fb': {
                 'type': 'object',
                 'properties': {
-                    'userID': {'type': 'string'},
+                    'userId': {'type': 'string'},
                     'authToken': {'type': 'string'}
                 },
-                'required': ['userID', 'authToken']
+                'required': ['userId', 'authToken']
             },
-            'firstName': {'type': 'string'},
-            'lastName': {'type': 'string'},
+            'firstname': {'type': 'string'},
+            'lastname': {'type': 'string'},
             'country': {'type': 'string'},
             'email': {'type': 'string'},
             'birthdate': {'type': 'string'}
         },
-        'required': ['username', 'password', 'fb', 'firstName', 'lastName',
+        'required': ['type', 'username', 'password', 'fb', 'firstname', 'lastname',
                      'country', 'email', 'birthdate']
     }
 
@@ -92,10 +94,12 @@ class SignUpUser(Resource):
         """Permite registrar un usuario"""
         content = validate_args(self.schema)
 
+        content['_ref'] = '327378'
+
         r = send_post(ss.URL + '/users', content)
 
         if content['type'] == 'passenger':
-            db.passengers.insert_one({'_id': r['id'], 'lat': '', 'lon': ''})
+            db.passengers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': ''})
         # db.passengers.insert_one({'_id': '238932', 'lat': '', 'lon': ''})
         else:
             db.drivers.insert_one({'_id': r['id'], 'lat': '', 'lon': ''})

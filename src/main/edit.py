@@ -36,10 +36,10 @@ class Edit(Resource):
             'fb': {
                 'type': 'object',
                 'properties': {
-                    'userID': {'type': 'string'},
+                    'userId': {'type': 'string'},
                     'authToken': {'type': 'string'}
                 },
-                'required': ['userID', 'authToken']
+                'required': ['userId', 'authToken']
             },
             'firstName': {'type': 'string'},
             'lastName': {'type': 'string'},
