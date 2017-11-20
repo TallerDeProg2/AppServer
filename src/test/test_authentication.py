@@ -61,7 +61,7 @@ class TestAuthentication(unittest.TestCase):
         mock_post.return_value.json.return_value = response_shared
 
         app2 = app.test_client()
-        response = app2.post('/', data=json.dumps(input), content_type='application/json')
+        response = app2.post('/validate', data=json.dumps(input), content_type='application/json')
         response_json = json.loads(response.get_data())
 
         assert_list_equal([response_json], output)
