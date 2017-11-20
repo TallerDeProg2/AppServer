@@ -31,13 +31,14 @@ errors = {
 
 api = Api(app, errors=errors)
 
-api.add_resource(authentication.LogIn, '/')
+api.add_resource(authentication.LogIn, '/validate')
 api.add_resource(authentication.HelloWorld, '/hola')
 api.add_resource(authentication.ByeWorld, '/chau')
 api.add_resource(authentication.SignUpUser, '/users')
 
 api.add_resource(edit.EditUser, '/passengers/<string:id>')
-api.add_resource(edit.EditCar, '/driver/<string:id>/cars')
+# api.add_resource(edit.EditUser, '/drivers/<string:id>')
+api.add_resource(edit.EditCar, '/drivers/<string:id>/cars')
 api.add_resource(edit.EditPayment, '/passengers/<string:id>/payment')
 
 api.add_resource(location.LocatePassenger, '/passengers/<string:id>/location')
