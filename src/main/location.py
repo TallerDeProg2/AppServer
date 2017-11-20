@@ -1,8 +1,8 @@
 from flask import Flask
 from flask_restful import Resource
-from src.main.edit import validate_token, validate_args
-import src.main.mongo_spec as db
 
+import src.main.constants.mongo_spec as db
+from src.main.edit import validate_args
 
 app = Flask(__name__)
 

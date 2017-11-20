@@ -1,10 +1,12 @@
+import logging
+
+import requests
 from flask import Flask
 from flask_restful import Resource, reqparse, abort
-import requests
-import logging
-from src.main.edit import validate_args
+import src.main.constants.mongo_spec as db
 import src.main.global_method as gm
-import src.main.mongo_spec as db
+from src.main.edit import validate_args
+import src.main.constants.shared_server as ss
 
 app = Flask(__name__)
 parser = reqparse.RequestParser()
@@ -53,7 +55,7 @@ class LogIn(Resource):
         """Permite loggear un usuario"""
         content = validate_args(self.schema)
 
-        r = send_post('direccionana/users/validate', content)
+        r = send_post(ss.URL + '/users/validate', content)
 
         #Crear token
         token = gm.encode_token(r['id'])
@@ -90,7 +92,7 @@ class SignUpUser(Resource):
         """Permite registrar un usuario"""
         content = validate_args(self.schema)
 
-        r = send_post('direccionana/users', content)
+        r = send_post(ss.URL + '/users', content)
 
         if content['type'] == 'passenger':
             db.passengers.insert_one({'_id': r['id'], 'lat': '', 'lon': ''})

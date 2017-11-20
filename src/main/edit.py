@@ -4,6 +4,7 @@ import requests
 import jsonschema as js
 import logging
 import src.main.global_method as gm
+import src.main.constants.shared_server as ss
 
 app = Flask(__name__)
 
@@ -49,7 +50,7 @@ class Edit(Resource):
         'required': ['username', 'password', 'fb', 'firstName', 'lastName',
                      'country', 'email', 'birthdate']
     }
-    url = 'direccionana/'
+    url = ss.URL
     endpoint = ''
 
     def put(self, id):
@@ -92,7 +93,7 @@ class EditUser(Edit):
         'required': ['username', 'password', 'fb', 'firstName', 'lastName',
                      'country', 'email', 'birthdate']
     }
-    url = 'direccionana/users/'
+    url = ss.URL + '/users/'
 
 
 class EditCar(Edit):
@@ -111,7 +112,7 @@ class EditCar(Edit):
         'required': ['brand', 'model', 'color', 'plate', 'year',
                      'status', 'radio', 'airconditioner']
     }
-    url = 'direccionana/driver/'
+    url = ss.URL + '/driver/'
     endpoint = '/cars'
 
 
@@ -127,5 +128,5 @@ class EditPayment(Edit):
         },
         'required': ['name', 'number', 'type', 'expirationMonth', 'expirationYear']
     }
-    url = 'direccionana/passenger/'
+    url = ss.URL + '/passenger/'
     endpoint = '/payment'

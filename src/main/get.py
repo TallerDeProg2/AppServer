@@ -1,9 +1,9 @@
-from flask import Flask, request
-from flask_restful import Resource, abort
-import requests
 import logging
-import src.main.mongo_spec as db
 
+import requests
+from flask import Flask
+from flask_restful import Resource, abort
+import src.main.constants.shared_server as ss
 
 app = Flask(__name__)
 
@@ -11,7 +11,7 @@ app = Flask(__name__)
 class GetPassenger(Resource):
     def get(self, id):
         try:
-            r = requests.get('direccionana/users' + id)
+            r = requests.get(ss.URL + '/users' + id)
             r.raise_for_status()
         except requests.exceptions.HTTPError:
             logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
@@ -22,7 +22,7 @@ class GetPassenger(Resource):
 class GetDriver(Resource):
     def get(self, id):
         try:
-            r = requests.get('direccionana/users' + id)
+            r = requests.get(ss.URL + '/users' + id)
             r.raise_for_status()
         except requests.exceptions.HTTPError:
             logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
@@ -33,7 +33,7 @@ class GetDriver(Resource):
 class GetCar(Resource):
     def get(self, id):
         try:
-            r = requests.get('direccionana/users' + id + '/cars')
+            r = requests.get(ss.URL + '/users' + id + '/cars')
             r.raise_for_status()
         except requests.exceptions.HTTPError:
             logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
