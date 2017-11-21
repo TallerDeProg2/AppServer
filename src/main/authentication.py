@@ -1,5 +1,4 @@
 import logging
-
 import requests
 from flask import Flask
 from flask_restful import Resource, reqparse, abort
@@ -7,6 +6,7 @@ import src.main.constants.mongo_spec as db
 import src.main.global_method as gm
 from src.main.edit import validate_args
 import src.main.constants.shared_server as ss
+import src.main.constants.schemas as sch
 
 app = Flask(__name__)
 parser = reqparse.RequestParser()
@@ -35,22 +35,7 @@ class ByeWorld(Resource):
 
 
 class LogIn(Resource):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'fb': {
-                'type': 'object',
-                'properties': {
-                    'userID': {'type': 'string'},
-                    'authToken': {'type': 'string'}
-                },
-                'required': ['userID', 'authToken']
-            },
-        },
-        'required': ['username', 'password', 'fb']
-    }
+    schema = sch.log_in_schema
 
     def post(self):
         """Permite loggear un usuario"""
@@ -66,29 +51,7 @@ class LogIn(Resource):
 
 
 class SignUpUser(Resource):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'type': {'type': 'string'},
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'fb': {
-                'type': 'object',
-                'properties': {
-                    'userId': {'type': 'string'},
-                    'authToken': {'type': 'string'}
-                },
-                'required': ['userId', 'authToken']
-            },
-            'firstname': {'type': 'string'},
-            'lastname': {'type': 'string'},
-            'country': {'type': 'string'},
-            'email': {'type': 'string'},
-            'birthdate': {'type': 'string'}
-        },
-        'required': ['type', 'username', 'password', 'fb', 'firstname', 'lastname',
-                     'country', 'email', 'birthdate']
-    }
+    schema = sch.sign_up_schema
 
     def post(self):
         """Permite registrar un usuario"""
@@ -102,7 +65,7 @@ class SignUpUser(Resource):
             db.passengers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': ''})
         # db.passengers.insert_one({'_id': '238932', 'lat': '', 'lon': ''})
         else:
-            db.drivers.insert_one({'_id': r['id'], 'lat': '', 'lon': ''})
+            db.drivers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': ''})
 
         return r, 201
         # return content, 201
