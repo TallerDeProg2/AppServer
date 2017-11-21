@@ -1,11 +1,10 @@
 import logging
-
 import googlemaps
 import jsonschema as js
 from flask import Flask, request
 from flask_restful import Resource, abort
-
 import src.main.constants.mongo_spec as db
+import src.main.constants.schemas as sch
 
 app = Flask(__name__)
 
@@ -13,15 +12,7 @@ gmaps = googlemaps.Client(key='AIzaSyBwLajy8yXPyJ3QjXT-QcBqRDFSEj5_Acs')
 
 
 class GetDirections(Resource):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'lat': {'type': 'number'},
-            'long': {'type': 'number'},
-            'token': {'type': 'integer'}
-        },
-        'required': ['lat', 'long', 'token']
-    }
+    schema = sch.location_schema
 
     def put(self, id):
         # validate_token(token, id) #Devuelve T o F, loggear

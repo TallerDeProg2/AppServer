@@ -10,14 +10,15 @@ import json
 @patch('src.main.edit.requests.put')
 def test_getting_user_when_response_is_ok(mock_put, mock_get, mock_validate_token):
     args = {
+            'type': 'passenger',
             'username': 'pepe',
             'password': 'lalala',
             'fb': {
-                    'userID': 'pepefb',
+                    'userId': 'pepefb',
                     'authToken': '1234'
                 },
-            'firstName': 'SOFIA',
-            'lastName': 'argento',
+            'firstname': 'SOFIA',
+            'lastname': 'argento',
             'country': 'argentina',
             'email': 'pepekpo@gmail.com',
             'birthdate': '27484'
@@ -28,11 +29,11 @@ def test_getting_user_when_response_is_ok(mock_put, mock_get, mock_validate_toke
             'username': 'pepe',
             'password': 'lalala',
             'fb': {
-                    'userID': 'pepefb',
+                    'userId': 'pepefb',
                     'authToken': '1234'
                 },
-            'firstName': 'juan',
-            'lastName': 'argento',
+            'firstname': 'juan',
+            'lastname': 'argento',
             'country': 'argentina',
             'email': 'pepekpo@gmail.com',
             'birthdate': '27484'
@@ -43,11 +44,11 @@ def test_getting_user_when_response_is_ok(mock_put, mock_get, mock_validate_toke
             'username': 'pepe',
             'password': 'lalala',
             'fb': {
-                    'userID': 'pepefb',
+                    'userId': 'pepefb',
                     'authToken': '1234'
                 },
-            'firstName': 'SOFIA',
-            'lastName': 'argento',
+            'firstname': 'SOFIA',
+            'lastname': 'argento',
             'country': 'argentina',
             'email': 'pepekpo@gmail.com',
             'birthdate': '27484'
@@ -78,11 +79,11 @@ def test_getting_error_message_when_response_is_not_ok(mock_put, mock_get, mock_
             'username': 'pepe',
             'password': 'lalala',
             'fb': {
-                    'userID': 'pepefb',
+                    'userId': 'pepefb',
                     'authToken': '1234'
                 },
-            'firstName': 'SOFIA',
-            'lastName': 'argento',
+            'firstname': 'SOFIA',
+            'lastname': 'argento',
             'country': 'argentina',
             'email': 'pepekpo@gmail.com',
             'birthdate': '27484'
@@ -93,11 +94,11 @@ def test_getting_error_message_when_response_is_not_ok(mock_put, mock_get, mock_
             'username': 'pepe',
             'password': 'lalala',
             'fb': {
-                    'userID': 'pepefb',
+                    'userId': 'pepefb',
                     'authToken': '1234'
                 },
-            'firstName': 'juan',
-            'lastName': 'argento',
+            'firstname': 'juan',
+            'lastname': 'argento',
             'country': 'argentina',
             'email': 'pepekpo@gmail.com',
             'birthdate': '27484'
