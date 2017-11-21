@@ -1,8 +1,8 @@
 from flask import Flask
 from flask_restful import Resource
-from src.main.edit import validate_token, validate_args
-import src.main.mongo_spec as db
-
+import src.main.constants.schemas as sch
+import src.main.constants.mongo_spec as db
+from src.main.edit import validate_args
 
 app = Flask(__name__)
 
@@ -11,22 +11,16 @@ def update_location(schema, collection, id): #Ver si conviene esto o herencia
     # validate_token(id)
     content = validate_args(schema)
 
-    collection.update_one({'_id': id},
-                             {'$set': {
+    collection.update_one({'_id': id}, {
+                            '$set': {
                                  'lon': content['lon'],
                                  'lat': content['lat']
-                             }})
+                                 }
+                            })
 
 
 class LocatePassenger(Resource):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'lat': {'type': 'number'},
-            'lon': {'type': 'number'}
-        },
-        'required': ['lat', 'lon']
-    }
+    schema = sch.location_schema
 
     def put(self, id):
         update_location(self.schema, db.passengers, id)
@@ -34,14 +28,7 @@ class LocatePassenger(Resource):
 
 
 class LocateDriver(Resource):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'lat': {'type': 'number'},
-            'lon': {'type': 'number'}
-        },
-        'required': ['lat', 'lon']
-    }
+    schema = sch.location_schema
 
     def put(self, id):
         update_location(self.schema, db.drivers, id)

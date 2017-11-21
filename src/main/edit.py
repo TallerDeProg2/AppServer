@@ -4,6 +4,8 @@ import requests
 import jsonschema as js
 import logging
 import src.main.global_method as gm
+import src.main.constants.shared_server as ss
+import src.main.constants.schemas as sch
 
 app = Flask(__name__)
 
@@ -27,29 +29,8 @@ def validate_token(id):
 
 
 class Edit(Resource):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'fb': {
-                'type': 'object',
-                'properties': {
-                    'userID': {'type': 'string'},
-                    'authToken': {'type': 'string'}
-                },
-                'required': ['userID', 'authToken']
-            },
-            'firstName': {'type': 'string'},
-            'lastName': {'type': 'string'},
-            'country': {'type': 'string'},
-            'email': {'type': 'string'},
-            'birthdate': {'type': 'string'}
-        },
-        'required': ['username', 'password', 'fb', 'firstName', 'lastName',
-                     'country', 'email', 'birthdate']
-    }
-    url = 'direccionana/'
+    schema = sch.user_full_schema
+    url = ss.URL
     endpoint = ''
 
     def put(self, id):
@@ -70,62 +51,16 @@ class Edit(Resource):
 
 
 class EditUser(Edit):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'fb': {
-                'type': 'object',
-                'properties': {
-                    'userID': {'type': 'string'},
-                    'authToken': {'type': 'string'}
-                },
-                'required': ['userID', 'authToken']
-            },
-            'firstName': {'type': 'string'},
-            'lastName': {'type': 'string'},
-            'country': {'type': 'string'},
-            'email': {'type': 'string'},
-            'birthdate': {'type': 'string'}
-        },
-        'required': ['username', 'password', 'fb', 'firstName', 'lastName',
-                     'country', 'email', 'birthdate']
-    }
-    url = 'direccionana/users/'
+    url = ss.URL + '/users/'
 
 
 class EditCar(Edit):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'brand': {'type': 'string'},
-            'model': {'type': 'string'},
-            'color': {'type': 'string'},
-            'plate': {'type': 'string'},
-            'year': {'type': 'string'},
-            'status': {'type': 'string'},
-            'radio': {'type': 'string'},
-            'airconditioner': {'type': 'boolean'}
-        },
-        'required': ['brand', 'model', 'color', 'plate', 'year',
-                     'status', 'radio', 'airconditioner']
-    }
-    url = 'direccionana/driver/'
+    schema = sch.car_schema
+    url = ss.URL + '/driver/'
     endpoint = '/cars'
 
 
 class EditPayment(Edit):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'name': {'type': 'string'},
-            'number': {'type': 'string'},
-            'type': {'type': 'string'},
-            'expirationMonth': {'type': 'string'},
-            'expirationYear': {'type': 'string'}
-        },
-        'required': ['name', 'number', 'type', 'expirationMonth', 'expirationYear']
-    }
-    url = 'direccionana/passenger/'
+    schema = sch.payment_schema
+    url = ss.URL + '/passenger/'
     endpoint = '/payment'

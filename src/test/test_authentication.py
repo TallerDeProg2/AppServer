@@ -14,11 +14,11 @@ class TestAuthentication(unittest.TestCase):
             'username': 'pepe',
             'password': 'lalala',
             'fb': {
-                    'userID': 'pepefb',
+                    'userId': 'pepefb',
                     'authToken': '1234'
                 },
-            'firstName': 'SOFIA',
-            'lastName': 'argento',
+            'firstname': 'SOFIA',
+            'lastname': 'argento',
             'country': 'argentina',
             'email': 'pepekpo@gmail.com',
             'birthdate': '27484'
@@ -28,11 +28,11 @@ class TestAuthentication(unittest.TestCase):
             'username': 'pepe',
             'password': 'lalala',
             'fb': {
-                    'userID': 'pepefb',
+                    'userId': 'pepefb',
                     'authToken': '1234'
                 },
-            'firstName': 'SOFIA',
-            'lastName': 'argento',
+            'firstname': 'SOFIA',
+            'lastname': 'argento',
             'country': 'argentina',
             'email': 'pepekpo@gmail.com',
             'birthdate': '27484',
@@ -43,11 +43,11 @@ class TestAuthentication(unittest.TestCase):
             'username': 'pepe',
             'password': 'lalala',
             'fb': {
-                'userID': 'pepefb',
+                'userId': 'pepefb',
                 'authToken': '1234'
             },
-            'firstName': 'SOFIA',
-            'lastName': 'argento',
+            'firstname': 'SOFIA',
+            'lastname': 'argento',
             'country': 'argentina',
             'email': 'pepekpo@gmail.com',
             'birthdate': '27484',
