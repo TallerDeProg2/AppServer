@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
-from src.main import authentication, edit, query, directions, location
+import logging
+import requests
 from flask import Flask
 from flask_restful import Api
-import logging
+from flask_restful import abort
+
+from src.main import authentication, edit, query, directions, location
 
 app = Flask(__name__)
+app.config["token"] = "servercito-token"
 
 logging.basicConfig(format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     filename='ubreLogs.log',
@@ -28,7 +32,7 @@ errors = {
         'status': 401
     }
 }
-#TODO generalizar los endpoints con plural o singular
+# TODO generalizar los endpoints con plural o singular
 api = Api(app, errors=errors)
 
 api.add_resource(authentication.LogIn, '/validate')
@@ -48,3 +52,13 @@ api.add_resource(directions.GetDirections, '/passengers/<string:id>/directions')
 
 api.add_resource(query.AvailableDrivers, '/passengers/<string:id>/drivers')
 api.add_resource(query.AvailableTrips, '/drivers/<string:id>/trips')
+
+
+# def getAppToken():
+#     try:
+#         r = requests.post('/servers/ping' + id, headers={'token': app.token})
+#         r.raise_for_status()
+#     except requests.exceptions.HTTPError:
+#         logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
+#         abort(r.status_code)
+#     return r

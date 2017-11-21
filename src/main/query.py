@@ -71,7 +71,7 @@ class AvailableDrivers(Resource):
     def _get_data_user(self, id):
         try:
             # todo hacer global el dominio de ana y apendearlo antes del endpoint
-            r = requests.get('users/' + id, headers={'token': "alguntokenguardado"})
+            r = requests.get('users/' + id, headers={'token': app.token})
             # todo le tengo que mandar el token por header
             r.raise_for_status()
         except requests.exceptions.HTTPError:
@@ -140,7 +140,7 @@ class AvailableTrips(Resource):
     def _get_data_user(self, id):
         try:
             # todo hacer global el dominio de ana y apendearlo antes del endpoint
-            r = requests.get('users/' + id, headers={'token': "alguntokenguardado"})
+            r = requests.get('users/' + id, headers={'token': app.token})
             # todo le tengo que mandar el token por header
             r.raise_for_status()
         except requests.exceptions.HTTPError:
