@@ -35,7 +35,7 @@ class ByeWorld(Resource):
 
 
 class LogIn(Resource):
-    schema = sch.log_in_schema
+    schema = sch.user_reduced_schema
 
     def post(self):
         """Permite loggear un usuario"""
@@ -51,13 +51,13 @@ class LogIn(Resource):
 
 
 class SignUpUser(Resource):
-    schema = sch.sign_up_schema
+    schema = sch.user_full_schema
 
     def post(self):
         """Permite registrar un usuario"""
         content = validate_args(self.schema)
 
-        content['_ref'] = '327378'
+        content['_ref'] = '327378' #TODO: Ver que mandarle
 
         r = send_post(ss.URL + '/users', content)
 
