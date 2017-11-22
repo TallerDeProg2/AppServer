@@ -2,14 +2,14 @@ from flask import Flask
 from flask_restful import Resource
 import src.main.constants.schemas as sch
 import src.main.constants.mongo_spec as db
-from src.main.edit import validate_args
+import src.main.global_method as gm
 
 app = Flask(__name__)
 
 
-def update_location(schema, collection, id): #Ver si conviene esto o herencia
-    # validate_token(id)
-    content = validate_args(schema)
+def update_location(schema, collection, id):
+    gm.check_token(id)
+    content = gm.validate_args(schema)
 
     collection.update_one({'_id': id}, {
                             '$set': {
@@ -20,18 +20,14 @@ def update_location(schema, collection, id): #Ver si conviene esto o herencia
 
 
 class LocatePassenger(Resource):
-    schema = sch.location_schema
-
     def put(self, id):
-        update_location(self.schema, db.passengers, id)
+        update_location(sch.location_schema, db.passengers, id)
         return 200
 
 
 class LocateDriver(Resource):
-    schema = sch.location_schema
-
     def put(self, id):
-        update_location(self.schema, db.drivers, id)
+        update_location(sch.location_schema, db.drivers, id)
         return 200
 
 
