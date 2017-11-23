@@ -67,3 +67,13 @@ def check_token(id):
     if not validate_token(token, id):
         logging.error('Token inválido')
         abort(401)
+
+
+def build_response(r, token):
+    response = r['user']
+    response['token'] = token
+    response.pop('_ref')
+    response.pop('cars')
+
+    return response
+

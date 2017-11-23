@@ -6,18 +6,15 @@ import src.main.constants.schemas as sch
 import logging
 import src.main.edit as edit
 import src.main.authentication as auth
+import src.main.get as gets
 
 app = Flask(__name__)
 
 
 class Passenger(Resource):
     def get(self, id):
-        try:
-            r = requests.get(ss.URL + '/users/' + id)
-            r.raise_for_status()
-        except requests.exceptions.HTTPError:
-            logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
-            abort(r.status_code)
+        service = gets.Get()
+        return service.get(ss.URL + '/users/' + id)
 
     def put(self, id):
         service = edit.Edit()
