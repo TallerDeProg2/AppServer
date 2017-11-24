@@ -69,9 +69,9 @@ def check_token(id):
         abort(401)
 
 
-def build_response(r, token):
+def build_response(r): #Meterle el fb o pedirle a ana q lo mande
     response = r['user']
-    response['token'] = token
+    # response['token'] = token
     response.pop('_ref')
     response.pop('cars')
 

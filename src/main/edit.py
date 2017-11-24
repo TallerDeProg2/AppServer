@@ -11,10 +11,17 @@ app = Flask(__name__)
 class Edit(Resource):
     def put(self, id, endpoint, schema):
         """Permite modificar"""
-        gm.check_token(id)
+        # gm.check_token(id)
         content = gm.validate_args(schema)
-        r = requests.get(endpoint).json()
-        content['_ref'] = r['_ref']
+
+        try:
+            r = requests.get(endpoint)
+            r.raise_for_status()
+        except requests.exceptions.HTTPError:
+            logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
+            abort(r.status_code)
+
+        content['_ref'] = r.json()['_ref']
 
         try:
             r = requests.put(endpoint, json=content)

@@ -41,13 +41,10 @@ class LogIn(Resource):
 
         r = send_post(ss.URL + '/users/validate', content)
 
-        print(r)
-
-        #Crear token
         token = gm.encode_token(r['user']['id'])
-        r['token'] = token
-        return r, 200
-        # return content
+        response = gm.build_response(r)
+        response['token'] = token
+        return response, 200
 
 
 class SignUpUser(Resource):
@@ -57,21 +54,20 @@ class SignUpUser(Resource):
         """Permite registrar un usuario"""
         content = gm.validate_args(self.schema)
 
-        content['_ref'] = '327378' #TODO: Ver que mandarle
+        content['_ref'] = '' #TODO: Ver que mandarle
 
         r = send_post(ss.URL + '/users', content)
 
-        # if content['type'] == 'passenger':
-        #     db.passengers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': ''})
-        # elif content['type'] == 'driver':
-        #     db.drivers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': ''})
-        # else:
-        #     logging.error('Parámetro type incorrecto: ' + content['type'])
-        #     abort(400)
+        if content['type'] == 'passenger':
+            db.passengers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': ''})
+        elif content['type'] == 'driver':
+            db.drivers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': ''})
+        else:
+            logging.error('Parámetro type incorrecto: ' + content['type'])
+            abort(400)
 
         logging.info('Usuario id: ' + r['user']['id'] + ' creado en base ' + content['type']) #No estaria loggeando
-
-        response = gm.build_response(r)
+        #TODO: No esta loggeando
+        response = gm.build_response(r) #Necesario devolver token vacio??
         return response, 201
-        # return content, 201
 
