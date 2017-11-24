@@ -20,8 +20,7 @@ class AvailableDrivers(Resource):
 
         if gm.validate_token(token):
             logging.info("token correcto")
-            passenger = db.passengers.find_one({'id': id})
-            # passenger = db.passengers.find_one({'_id': ObjectId(_id)})
+            passenger = db.passengers.find_one({'_id': id})
 
             if passenger:
                 repuesta = self._get_drivers_cercanos(passenger)
@@ -41,8 +40,8 @@ class AvailableDrivers(Resource):
         """
         # convert decimal degrees to radians
         londriver, latdriver = driver['lon'], driver['lat']
-        lon_p, lat_p, lon_d, lat_d = map(radians, [int(passenger['lon'])
-            , int(passenger['lat']), int(londriver), int(latdriver)])
+        lon_p, lat_p, lon_d, lat_d = map(radians, [float(passenger['lon'])
+            , float(passenger['lat']), float(londriver), float(latdriver)])
         lon_distance = lon_d - lon_p
         lat_distance = lat_d - lat_p
         a = sin(lat_distance / 2) ** 2 + cos(lat_p) * cos(lat_d) * sin(lon_distance / 2) \
@@ -63,15 +62,15 @@ class AvailableDrivers(Resource):
         for x in db.drivers.find({}, {'_id': 0, 'token': 0}):
             if self._esta_cerca(passenger, x):
                 # todo ver el tema del id _id si tenemos los dos y no mostramos el dafault de mongo o que ondis
-                # r = self._get_data_user(x['id'])
+                # r = self._get_data_user(x['_id'])
                 # cercanos.append(jsonify(driver=r, position={'lat': x['lat'], 'lon': x['lon']}))
                 cercanos.append(x)
         return cercanos
 
-    def _get_data_user(self, id):
+    def _get_data_user(self, _id):
         try:
             # todo hacer global el dominio de ana y apendearlo antes del endpoint
-            r = requests.get('users/' + id, headers={'token': app.token})
+            r = requests.get('users/' + _id, headers={'token': 'app.token'})
             # todo le tengo que mandar el token por header
             r.raise_for_status()
         except requests.exceptions.HTTPError:
@@ -87,7 +86,7 @@ class AvailableTrips(Resource):
 
         if gm.validate_token(token):
             logging.info("token correcto")
-            driver = db.drivers.find_one({'id': id})
+            driver = db.drivers.find_one({'_id': id})
 
             if driver:
                 repuesta = self._get_trips(driver)
@@ -108,8 +107,8 @@ class AvailableTrips(Resource):
         """
         # convert decimal degrees to radians
         londriver, latdriver = driver['lon'], driver['lat']
-        lon_p, lat_p, lon_d, lat_d = map(radians, [int(passenger['lon'])
-            , int(passenger['lat']), int(londriver), int(latdriver)])
+        lon_p, lat_p, lon_d, lat_d = map(radians, [float(passenger['lon'])
+            , float(passenger['lat']), float(londriver), float(latdriver)])
         lon_distance = lon_d - lon_p
         lat_distance = lat_d - lat_p
         a = sin(lat_distance / 2) ** 2 + cos(lat_p) * cos(lat_d) * sin(lon_distance / 2) \
@@ -128,11 +127,11 @@ class AvailableTrips(Resource):
     def _get_trips(self, driver):
         cercanos = []
         for x in db.trips.find({}, {'_id': 0}):
-            passenger = db.passengers.find({'id': x['passenger_id']}) #todo ver nombre
+            passenger = db.passengers.find({'_id': x['passenger_id']}) #todo ver nombre
             # todo error si no esta el passagero en base
             if passenger and self._esta_cerca(passenger, driver):
                 # todo ver el tema del id _id si tenemos los dos y no mostramos el dafault de mongo o que ondis
-                # r = self._get_data_user(x['id'])
+                # r = self._get_data_user(x['_id'])
                 # cercanos.append(jsonify(driver=r, position={'lat': x['lat'], 'lon': x['lon']}))
                 cercanos.append(x)
         return cercanos
@@ -140,7 +139,7 @@ class AvailableTrips(Resource):
     def _get_data_user(self, id):
         try:
             # todo hacer global el dominio de ana y apendearlo antes del endpoint
-            r = requests.get('users/' + id, headers={'token': app.token})
+            r = requests.get('users/' + id, headers={'token': 'app.token'})
             # todo le tengo que mandar el token por header
             r.raise_for_status()
         except requests.exceptions.HTTPError:
