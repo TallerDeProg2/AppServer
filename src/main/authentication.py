@@ -54,9 +54,10 @@ class SignUpUser(Resource):
         """Permite registrar un usuario"""
         content = gm.validate_args(self.schema)
 
-        content['_ref'] = '' #TODO: Ver que mandarle
+        content['_ref'] = ''
 
         r = send_post(ss.URL + '/users', content)
+        print(r)
 
         if content['type'] == 'passenger':
             db.passengers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': ''})
@@ -66,8 +67,8 @@ class SignUpUser(Resource):
             logging.error('Parámetro type incorrecto: ' + content['type'])
             abort(400)
 
-        logging.info('Usuario id: ' + r['user']['id'] + ' creado en base ' + content['type']) #No estaria loggeando
+        logging.info('Usuario id: ' + r['user']['id'] + ' creado en base ' + content['type'])
         #TODO: No esta loggeando
-        response = gm.build_response(r) #Necesario devolver token vacio??
-        return response, 201
+        response = gm.build_response(r)
+        return r, 201
 

@@ -25,9 +25,11 @@ def test_getting_user_when_response_is_ok(mock_put, mock_get, mock_validate_toke
         }
 
     user = {
+        'user': {
             '_ref': 5678,
             'username': 'pepe',
             'password': 'lalala',
+            'cars': {},
             'fb': {
                     'userId': 'pepefb',
                     'authToken': '1234'
@@ -38,11 +40,14 @@ def test_getting_user_when_response_is_ok(mock_put, mock_get, mock_validate_toke
             'email': 'pepekpo@gmail.com',
             'birthdate': '27484'
         }
+    }
 
-    modified_user = [{
+    modified_user = {
+        'user': {
             '_ref': 5678,
             'username': 'pepe',
             'password': 'lalala',
+            'cars': {},
             'fb': {
                     'userId': 'pepefb',
                     'authToken': '1234'
@@ -52,7 +57,8 @@ def test_getting_user_when_response_is_ok(mock_put, mock_get, mock_validate_toke
             'country': 'argentina',
             'email': 'pepekpo@gmail.com',
             'birthdate': '27484'
-        }]
+        }
+    }
     header = {'token': '838298'}
 
     mock_validate_token.return_value = True
@@ -68,7 +74,7 @@ def test_getting_user_when_response_is_ok(mock_put, mock_get, mock_validate_toke
                         content_type='application/json')
     response_json = json.loads(response.get_data())
 
-    assert_list_equal(response_json, modified_user)
+    assert_list_equal([response_json], [modified_user['user']])
 
 
 @patch('src.main.global_method.validate_token')

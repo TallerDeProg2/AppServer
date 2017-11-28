@@ -72,8 +72,7 @@ location_schema = {
         'type': 'object',
         'properties': {
             'lat': {'type': 'number'},
-            'lon': {'type': 'number'},
-            'token': {'type': 'integer'}
+            'lon': {'type': 'number'}
         },
-        'required': ['lat', 'lon', 'token']
+        'required': ['lat', 'lon']
     }

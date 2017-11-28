@@ -70,6 +70,11 @@ def check_token(id):
 
 
 def build_response(r): #Meterle el fb o pedirle a ana q lo mande
+    """
+        Generates a suitable response for the client
+        :param json:
+        :return: json
+    """
     response = r['user']
     # response['token'] = token
     response.pop('_ref')
