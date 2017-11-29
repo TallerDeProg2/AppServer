@@ -126,7 +126,7 @@ class AvailableTrips(Resource):
 
     def _get_trips(self, driver):
         cercanos = []
-        for x in db.trips.find({}, {'_id': 0}):
+        for x in db.trips.find():
             passenger = db.passengers.find({'_id': x['passenger_id']}) #todo ver nombre
             # todo error si no esta el passagero en base
             if passenger and self._esta_cerca(passenger, driver):

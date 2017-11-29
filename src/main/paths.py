@@ -5,7 +5,7 @@ from flask import Flask
 from flask_restful import Api
 from flask_restful import abort
 
-from src.main import authentication, edit, query, directions, location
+from src.main import authentication, edit, query, directions, location, match
 
 app = Flask(__name__)
 app.config["token"] = "servercito-token"
@@ -30,6 +30,10 @@ errors = {
     'Unauthorized': {
         'message': "No autorizado",
         'status': 401
+    },
+    'Conflict': {
+        'message': "Solicitud no pudo ser procesada por conflicto de recursos",
+        'status': 409
     }
 }
 # TODO generalizar los endpoints con plural o singular
@@ -53,12 +57,4 @@ api.add_resource(directions.GetDirections, '/passengers/<string:id>/directions')
 api.add_resource(query.AvailableDrivers, '/passengers/<string:id>/drivers')
 api.add_resource(query.AvailableTrips, '/drivers/<string:id>/trips')
 
-
-# def getAppToken():
-#     try:
-#         r = requests.post('/servers/ping' + id, headers={'token': app.token})
-#         r.raise_for_status()
-#     except requests.exceptions.HTTPError:
-#         logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
-#         abort(r.status_code)
-#     return r
+api.add_resource(match.TripRequest, '/passengers/<string:id>/tripsRequests')
