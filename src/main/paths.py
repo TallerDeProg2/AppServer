@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from src.main import authentication, query, directions, location, controller_passenger, controller_car, controller_payment
+from src.main import authentication, query, directions, location, controller_passenger, controller_car, controller_payment, controller_driver
 from flask import Flask
 from flask_restful import Api
 import logging
@@ -37,6 +37,7 @@ api.add_resource(authentication.ByeWorld, '/chau')
 api.add_resource(authentication.SignUpUser, '/users')
 
 api.add_resource(controller_passenger.Passenger, '/passengers/<string:id>')
+api.add_resource(controller_driver.Driver, '/drivers/<string:id>')
 api.add_resource(controller_car.Car, '/drivers/<string:id>/cars')
 api.add_resource(controller_payment.Payment, '/passengers/<string:id>/payment')
 
