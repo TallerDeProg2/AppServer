@@ -8,9 +8,9 @@ import src.main.get as gets
 app = Flask(__name__)
 
 
-class Passenger(Resource):
+class Driver(Resource):
     def get(self, id):
-        service = gets.Get()
+        service = gets.Get() #TODO: Validar que devuelva driver y no passenger
         return service.get(ss.URL + '/users/' + id)
 
     def put(self, id):
