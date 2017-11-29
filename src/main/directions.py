@@ -5,6 +5,7 @@ from flask import Flask, request
 from flask_restful import Resource, abort
 import src.main.constants.mongo_spec as db
 import src.main.constants.schemas as sch
+import src.main.global_method as gm
 
 app = Flask(__name__)
 
@@ -15,7 +16,7 @@ class GetDirections(Resource):
     schema = sch.location_schema
 
     def put(self, id):
-        # validate_token(token, id) #Devuelve T o F, loggear
+        gm.check_token(id)
         content = request.json
         try:
             js.validate(content, self.schema)

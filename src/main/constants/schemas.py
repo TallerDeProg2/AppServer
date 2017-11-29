@@ -67,17 +67,6 @@ payment_schema = {
     'required': ['name', 'number', 'type', 'expirationmonth', 'expirationyear']
 }
 
-location_schema = {
-    'type': 'object',
-    'properties': {
-        'lat': {'type': 'number'},
-        'lon': {'type': 'number'},
-        'token': {'type': 'integer'}
-    },
-    'required': ['lat', 'lon', 'token']
-}
-
-
 # TODO: agregar propuesta de camino
 trip_request_schema = {
     'type': 'object',
@@ -335,3 +324,13 @@ trips_full_schema = {
 #     "parameters": {}
 #   }
 # }
+
+location_schema = {
+        'type': 'object',
+        'properties': {
+            'lat': {'type': 'number'},
+            'lon': {'type': 'number'}
+        },
+        'required': ['lat', 'lon']
+    }
+

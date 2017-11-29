@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
+
 import logging
 import requests
+
+from src.main import authentication, query, directions, location, controller_passenger, controller_car, controller_payment
+
 from flask import Flask
 from flask_restful import Api
 from flask_restful import abort
@@ -44,10 +48,9 @@ api.add_resource(authentication.HelloWorld, '/hola')
 api.add_resource(authentication.ByeWorld, '/chau')
 api.add_resource(authentication.SignUpUser, '/users')
 
-api.add_resource(edit.EditUser, '/passengers/<string:id>')
-# api.add_resource(edit.EditUser, '/drivers/<string:id>')
-api.add_resource(edit.EditCar, '/drivers/<string:id>/cars')
-api.add_resource(edit.EditPayment, '/passengers/<string:id>/payment')
+api.add_resource(controller_passenger.Passenger, '/passengers/<string:id>')
+api.add_resource(controller_car.Car, '/drivers/<string:id>/cars')
+api.add_resource(controller_payment.Payment, '/passengers/<string:id>/payment')
 
 api.add_resource(location.LocatePassenger, '/passengers/<string:id>/location')
 api.add_resource(location.LocateDriver, '/drivers/<string:id>/location')

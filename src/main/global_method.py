@@ -1,6 +1,10 @@
 from src.main import config
 import jwt
 import datetime
+from flask import request
+import jsonschema as js
+import logging
+from flask_restful import abort
 
 
 def encode_token(user_id):
@@ -45,3 +49,36 @@ def validate_token(token, user_id=None):
         else:
             return decoded_token == user_id
     return False
+
+
+def validate_args(schema):
+    content = request.json   # Ver si esto bien o mal
+    try:
+        js.validate(content, schema)
+    except js.exceptions.ValidationError:
+        logging.error('Argumentos ingresados inválidos')
+        abort(400)
+
+    return content
+
+
+def check_token(id):
+    token = request.headers['token']  # Ver si esto bien o mal
+    if not validate_token(token, id):
+        logging.error('Token inválido')
+        abort(401)
+
+
+def build_response(r): #Meterle el fb o pedirle a ana q lo mande
+    """
+        Generates a suitable response for the client
+        :param json:
+        :return: json
+    """
+    response = r['user']
+    # response['token'] = token
+    response.pop('_ref')
+    response.pop('cars')
+
+    return response
+

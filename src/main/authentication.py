@@ -4,12 +4,10 @@ from flask import Flask
 from flask_restful import Resource, reqparse, abort
 import src.main.constants.mongo_spec as db
 import src.main.global_method as gm
-from src.main.edit import validate_args
 import src.main.constants.shared_server as ss
 import src.main.constants.schemas as sch
 
 app = Flask(__name__)
-parser = reqparse.RequestParser()
 
 
 def send_post(endpoint, content):
@@ -39,15 +37,14 @@ class LogIn(Resource):
 
     def post(self):
         """Permite loggear un usuario"""
-        content = validate_args(self.schema)
+        content = gm.validate_args(self.schema)
 
         r = send_post(ss.URL + '/users/validate', content)
 
-        #Crear token
-        token = gm.encode_token(r['id'])
-        r['token'] = token
-        return r, 200
-        # return content
+        token = gm.encode_token(r['user']['id'])
+        response = gm.build_response(r)
+        response['token'] = token
+        return response, 200
 
 
 class SignUpUser(Resource):
@@ -55,11 +52,12 @@ class SignUpUser(Resource):
 
     def post(self):
         """Permite registrar un usuario"""
-        content = validate_args(self.schema)
+        content = gm.validate_args(self.schema)
 
-        content['_ref'] = '327378' #TODO: Ver que mandarle
+        content['_ref'] = ''
 
         r = send_post(ss.URL + '/users', content)
+        print(r)
 
         if content['type'] == 'passenger':
             db.passengers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': ''})
@@ -69,6 +67,8 @@ class SignUpUser(Resource):
             logging.error('Parámetro type incorrecto: ' + content['type'])
             abort(400)
 
+        logging.info('Usuario id: ' + r['user']['id'] + ' creado en base ' + content['type'])
+        #TODO: No esta loggeando
+        response = gm.build_response(r)
         return r, 201
-        # return content, 201
 

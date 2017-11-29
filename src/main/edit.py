@@ -1,66 +1,42 @@
 from flask import Flask, request, jsonify
 from flask_restful import Resource, reqparse, abort
 import requests
-import jsonschema as js
 import logging
 import src.main.global_method as gm
-import src.main.constants.shared_server as ss
-import src.main.constants.schemas as sch
+import jsonschema as js
+
 
 app = Flask(__name__)
 
 
-def validate_args(schema):
-    content = request.json
-    try:
-        js.validate(content, schema)
-    except js.exceptions.ValidationError:
-        logging.error('Argumentos ingresados inválidos')
-        abort(400)
-
-    return content
-
-
-def validate_token(id):
-    token = request.headers['token'] #Ver si esto bien o mal
-    if not gm.validate_token(token, id):
-        logging.error('Token inválido')
-        abort(401)
-
-
 class Edit(Resource):
-    schema = sch.user_full_schema
-    url = ss.URL
-    endpoint = ''
-
-    def put(self, id):
+    def put(self, id, endpoint, schema):
         """Permite modificar"""
-        validate_token(id)
-        content = validate_args(self.schema)
-        r = requests.get(self.url + id + self.endpoint).json()
-        content['_ref'] = r['_ref']
+        # gm.check_token(id)
+        content = request.json
+        try:
+            js.validate(content, schema)
+        except js.exceptions.ValidationError:
+            logging.error('Argumentos ingresados inválidos')
+            abort(400)
 
         try:
-            r = requests.put(self.url + id + self.endpoint, json=content)
+            r = requests.get(endpoint, headers={'token': 'superservercito-token'})
             r.raise_for_status()
         except requests.exceptions.HTTPError:
-            logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
+            logging.error('Conexión con el Shared dio error en get: ' + repr(r.status_code))
             abort(r.status_code)
 
-        return r.json()
+        print(r.json())
 
+        content['_ref'] = r.json()['user']['_ref']
 
-class EditUser(Edit):
-    url = ss.URL + '/users/'
+        try:
+            r = requests.put(endpoint, json=content, headers={'token': 'superservercito-token'})
+            r.raise_for_status()
+        except requests.exceptions.HTTPError:
+            logging.error('Conexión con el Shared dio error en put: ' + repr(r.status_code))
+            abort(r.status_code)
 
+        return gm.build_response(r.json())
 
-class EditCar(Edit):
-    schema = sch.car_schema
-    url = ss.URL + '/driver/'
-    endpoint = '/cars'
-
-
-class EditPayment(Edit):
-    schema = sch.payment_schema
-    url = ss.URL + '/passenger/'
-    endpoint = '/payment'

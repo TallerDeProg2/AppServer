@@ -25,18 +25,22 @@ class TestAuthentication(unittest.TestCase):
         }
 
         response_shared = {
-            'username': 'pepe',
-            'password': 'lalala',
-            'fb': {
-                    'userId': 'pepefb',
-                    'authToken': '1234'
-                },
-            'firstname': 'SOFIA',
-            'lastname': 'argento',
-            'country': 'argentina',
-            'email': 'pepekpo@gmail.com',
-            'birthdate': '27484',
-            'id': '383948'
+            'user': {
+                'username': 'pepe',
+                'password': 'lalala',
+                '_ref': '7284759248784',
+                'cars': {},
+                'fb': {
+                        'userId': 'pepefb',
+                        'authToken': '1234'
+                    },
+                'firstname': 'SOFIA',
+                'lastname': 'argento',
+                'country': 'argentina',
+                'email': 'pepekpo@gmail.com',
+                'birthdate': '27484',
+                'id': '383948'
+            }
         }
 
         output = [{
