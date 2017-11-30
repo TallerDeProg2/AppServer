@@ -12,7 +12,6 @@ import src.main.constants.schemas as sch
 import src.main.constants.shared_server as ss
 from src.main import global_method as gm
 from src.main.constants import mongo_spec as db
-from datetime import datetime
 import requests
 import src.main.constants.shared_server as ss
 
@@ -119,8 +118,10 @@ class TripStart(Resource):
 
          """
         trip = db.passengers.find_one({'_id': id})
-        start_time = datetime.now()
-        wait_time = datetime.now() - trip['waitTime']
+        start_time = datetime.datetime.now()
+        start_time = start_time.strftime("%Y-%m-%d %H:%M:%S ") + "ART"
+
+        wait_time = datetime.datetime.now() - trip['waitTime']
         wait_time = round(wait_time.total_seconds())
 
         db.trips.update_one({'_id': id}, {
@@ -143,15 +144,15 @@ class TripEnd(Resource):
         content = request.json
 
         trip = db.trips.find_one({'_id': id})
-        end_time = datetime.now()
-        trip_time = datetime.now() - trip['startTime']
+        end_time = datetime.datetime.now()
+        start_datetime = datetime.datetime.strptime(trip['startTime'], "%Y-%m-%d %H:%M:%S ")
+        trip_time = datetime.datetime.now() - start_datetime
         trip_time = round(trip_time.total_seconds())
-        total_distance = trip['google']['legs'][0]['distance']['value']
+        total_distance = trip['distance']
 
         if content['paymethod'] == 'cash':
-            paymethod = 'cash'
+            properties = {}
         elif content['paymethod'] == 'card':
-            paymethod = 'card'
             try:
                 r = requests.get(ss.URL + '/user/' + trip['passenger'], headers={'token': 'superservercito-token'})
                 r.raise_for_status()
@@ -168,8 +169,8 @@ class TripEnd(Resource):
             'distance': total_distance,
             'traveltime': trip_time,
             'paymethod': content['paymethod'],
-            'day': '',
-            'travelhour': ''
+            'day': start_datetime.strftime("%A"),
+            'travelhour': trip['startTime']
         }
 
         try:
@@ -179,7 +180,13 @@ class TripEnd(Resource):
             logging.error('Conexión con el Shared dio error en post: ' + repr(r.status_code))
             abort(r.status_code)
 
-        total_cost = r['cost']
+        trip['cost']['currency'] = 'ARS'
+        trip['cost']['value'] = r['cost']
+        trip['travelTime'] = trip_time
+        trip['totalTime'] = trip_time  #Despues seria el trip time + wait time
+        trip['paymethod']['paymethod'] = content['paymethod']
+        trip['paymethod']['parameters'] = properties
+
 
         try:
             r = requests.post(ss.URL + '/trips', json=payload, headers={'token': 'superservercito-token'})
@@ -193,7 +200,6 @@ class TripEnd(Resource):
                 'available': True
             }
         })
-
 
         return 200
 

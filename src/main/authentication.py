@@ -67,7 +67,7 @@ class SignUpUser(Resource):
             logging.error('Parámetro type incorrecto: ' + content['type'])
             abort(400)
 
-        logging.info('Usuario id: ' + r['user']['id'] + ' creado en base ' + content['type'])
+        logging.info('Usuario id: ' + repr(r['user']['id']) + ' creado en base ' + content['type'])
         #TODO: No esta loggeando
         response = gm.build_response(r)
         return r, 201
