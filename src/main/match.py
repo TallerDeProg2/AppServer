@@ -9,6 +9,7 @@ from flask_restful import Resource, abort
 import src.main.constants.schemas as sch
 from src.main import global_method as gm
 from src.main.constants import mongo_spec as db
+import datetime
 
 # {
 #         "username": "aye", "trip": {   "start": {"lat": 0,  "lon": 0 }, "end":  { "lat": 1, "lon": 1 }    },  "paymethod": {  "paymethod": "efectivo" }
@@ -101,3 +102,45 @@ class TripRequest(Resource):
         #         abort(400)
         #
         #     return content
+
+
+#Chofer acepta viaje
+class TripConfirmation(Resource):
+    def post(self, id):
+        """
+            Deletes available trip from database and
+            sets driver to not available
+
+        """
+        token = request.headers['token']
+        if not gm.validate_token(token, id):
+            logging.error('Token inválido')
+            abort(401)
+
+        content = request.json
+        try:
+            js.validate(content, schema)
+        except js.exceptions.ValidationError:
+            logging.error('Argumentos ingresados inválidos')
+            abort(400)
+
+        db.trips.delete_one({'_id': content['trip']['id']})
+        db.drivers.update_one({'_id': id}, {
+            '$set': {
+                'available': False,
+                'waitTime': datetime.now()
+            }
+        })
+
+        return 200
+
+
+# class TripStart(Resource):
+#     def post(self, id):
+#         """
+#             Updates waiting time
+#
+#          """
+#         trip = db.trips.find_one({'_id': id})
+#         wait_time = trip['waitTime']
+

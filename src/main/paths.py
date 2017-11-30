@@ -61,3 +61,5 @@ api.add_resource(query.AvailableDrivers, '/passengers/<string:id>/drivers')
 api.add_resource(query.AvailableTrips, '/drivers/<string:id>/trips')
 
 api.add_resource(match.TripRequest, '/passengers/<string:id>/tripsRequests')
+
+api.add_resource(match.TripConfirmation, '/drivers/<string:id>/trip/confirmation')
