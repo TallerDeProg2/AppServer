@@ -36,15 +36,15 @@ api.add_resource(authentication.HelloWorld, '/hola')
 api.add_resource(authentication.ByeWorld, '/chau')
 api.add_resource(authentication.SignUpUser, '/users')
 
-api.add_resource(controller_passenger.Passenger, '/passengers/<string:id>')
-api.add_resource(controller_driver.Driver, '/drivers/<string:id>')
-api.add_resource(controller_car.Car, '/drivers/<string:id>/cars')
-api.add_resource(controller_payment.Payment, '/passengers/<string:id>/payment')
+api.add_resource(controller_passenger.Passenger, '/passengers/<int:id>')
+api.add_resource(controller_driver.Driver, '/drivers/<int:id>')
+api.add_resource(controller_car.Car, '/drivers/<int:id>/cars')
+api.add_resource(controller_payment.Payment, '/passengers/<int:id>/payment')
 
-api.add_resource(location.LocatePassenger, '/passengers/<string:id>/location')
-api.add_resource(location.LocateDriver, '/drivers/<string:id>/location')
+api.add_resource(location.LocatePassenger, '/passengers/<int:id>/location')
+api.add_resource(location.LocateDriver, '/drivers/<int:id>/location')
 
-api.add_resource(directions.GetDirections, '/passengers/<string:id>/directions')
+api.add_resource(directions.GetDirections, '/passengers/<int:id>/directions')
 
 # api.add_resource(query.AvailableDrivers, '/passenger/<string:_id>/drivers')
 api.add_resource(query.AvailableDrivers, '/passenger/drivers')
