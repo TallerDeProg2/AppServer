@@ -49,7 +49,7 @@ api.add_resource(authentication.ByeWorld, '/chau')
 api.add_resource(authentication.SignUpUser, '/users')
 
 api.add_resource(controller_passenger.Passenger, '/passengers/<string:id>')
-api.add_resource(controller_car.Car, '/drivers/<string:id>/cars')
+api.add_resource(controller_car.Car, '/drivers/f <string:id>/cars')
 api.add_resource(controller_payment.Payment, '/passengers/<string:id>/payment')
 
 api.add_resource(location.LocatePassenger, '/passengers/<string:id>/location')
@@ -60,7 +60,9 @@ api.add_resource(directions.GetDirections, '/passengers/<string:id>/directions')
 api.add_resource(query.AvailableDrivers, '/passengers/<string:id>/drivers')
 api.add_resource(query.AvailableTrips, '/drivers/<string:id>/trips')
 
-api.add_resource(match.TripRequest, '/passengers/<string:id>/tripsRequests')
 
+api.add_resource(match.TripRequest, '/passengers/<string:id>/trips/request')
+api.add_resource(match.TripEstimate, '/trips/estimate')
 api.add_resource(match.TripConfirmation, '/drivers/<string:id>/trip/confirmation')
 api.add_resource(match.TripStart, '/trips/<string:id>/id/start')
+
