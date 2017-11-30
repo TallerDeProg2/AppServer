@@ -11,8 +11,8 @@ app = Flask(__name__)
 class Driver(Resource):
     def get(self, id):
         service = gets.Get() #TODO: Validar que devuelva driver y no passenger
-        return service.get(ss.URL + '/users/' + id)
+        return service.get(ss.URL + '/users/' + repr(id))
 
     def put(self, id):
         service = edit.Edit()
-        return service.put(id, ss.URL + '/users/' + id, sch.user_full_schema)
+        return service.put(id, ss.URL + '/users/' + repr(id), sch.user_full_schema)

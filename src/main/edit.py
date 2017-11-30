@@ -27,7 +27,6 @@ class Edit(Resource):
             logging.error('Conexión con el Shared dio error en get: ' + repr(r.status_code))
             abort(r.status_code)
 
-
         content['_ref'] = r.json()['user']['_ref']
 
         try:
