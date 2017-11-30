@@ -12,7 +12,7 @@ app = Flask(__name__)
 class Edit(Resource):
     def put(self, id, endpoint, schema):
         """Permite modificar"""
-        # gm.check_token(id)
+        gm.check_token(id)
         content = request.json
         try:
             js.validate(content, schema)

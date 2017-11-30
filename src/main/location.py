@@ -9,10 +9,10 @@ app = Flask(__name__)
 
 
 def update_location(schema, collection, id):
-    # token = request.headers['token']
-    # if not gm.validate_token(token, id):
-    #     logging.error('Token inválido')
-    #     abort(401)
+    token = request.headers['token']
+    if not gm.validate_token(token, id):
+        logging.error('Token inválido')
+        abort(401)
 
     content = gm.validate_args(schema)
 
