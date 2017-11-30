@@ -24,15 +24,15 @@ class GetDirections(Resource):
             logging.error('Argumentos ingresados inválidos')
             abort(400)
 
-        origindb = db.passengers.find_one({'_id': id})
-        if origindb == None:
-            logging.error('Id de usuario inexistente')
-            abort(404)
-        # origindb = {'lat': -34.5903345,
-        #             'lon': -58.4161065}
+        # origindb = db.passengers.find_one({'_id': id})
+        # if origindb == None:
+        #     logging.error('Id de usuario inexistente')
+        #     abort(404)
+        origindb = {'lat': -34.5903345,
+                    'lon': -58.4161065}
 
         origin = str(origindb['lat']) + ',' + str(origindb['lon'])
         destiny = str(content['lat']) + ',' + str(content['lon'])
         directions = gmaps.directions(origin, destiny, alternatives=True)
 
-        return directions
+        return {'routes': directions}
