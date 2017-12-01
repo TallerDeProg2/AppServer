@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
-<<<<<<< HEAD
 
 import logging
 import requests
 
-from src.main import authentication, query, directions, location, controller_passenger, controller_car, controller_payment
-
-=======
 from src.main import authentication, query, directions, location, controller_passenger, controller_car, controller_payment, controller_driver
->>>>>>> 4bd1e0b999bd16ec2b24b4426eca74f641ee348d
+
 from flask import Flask
 from flask_restful import Api
 from flask_restful import abort
