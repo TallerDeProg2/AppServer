@@ -67,123 +67,13 @@ payment_schema = {
     'required': ['name', 'number', 'type', 'expirationmonth', 'expirationyear']
 }
 
-# TODO: agregar propuesta de camino
-trip_request_schema = {
+location_schema = {
     'type': 'object',
     'properties': {
-        'username': {'type': 'string'},
-        'trip': {                           # VER si puede generar conflictos este nombre
-            'type': 'object',
-            'properties': {
-                'start': {
-                    'type': 'object',
-                    'properties': {
-
-                        'lat': {'type': 'integer'},
-                        'lon': {'type': 'integer'}
-                    },
-                    'required': ['lat', 'lon']
-                },
-                'end': {
-                    'type': 'object',
-                    'properties': {
-                        'lat': {'type': 'integer'},
-                        'lon': {'type': 'integer'}
-                    },
-                    'required': ['lat', 'lon']
-                },
-            },
-            'required': ['start', 'end']
-        },
-        'paymethod': {
-            'type': 'object',
-            'properties': {
-                'paymethod': {'type': 'string'},
-                # 'parameters': {
-                #     'type': 'object',
-                #     'properties': {
-                #         'MISTICO': {'type': 'string'},  ## ESTA COMO JSON VACIO QUE ONDA?
-                #
-                #     },
-                #     #'required': ['']
-                # }
-            },
-            'required': ['paymethod']
-        },
+        'lat': {'type': 'number'},
+        'lon': {'type': 'number'}
     },
-    'required': ['username', 'trip', 'paymethod']
-}
-
-trips_reduced_schema = {
-    'type': 'object',
-    'properties': {
-        'trip': {
-            'type': 'object',
-            'properties': {
-                'start': {
-                    'type': 'object',
-                    'properties': {
-                        'address': {
-                            'type': 'object',
-                            'properties': {
-                                # 'street': {'type': 'string'},
-                                'location': {
-                                    'type': 'object',
-                                    'properties': {
-                                        'lat': {'type': 'integer'},
-                                        'lon': {'type': 'integer'}
-                                    },
-                                    # 'required': ['lat', 'lon', 'token']
-                                },
-                            },
-                            # 'required': ['lat', 'lon', 'token']
-                        },
-                        # 'timestamp': {'type': 'integer'}
-                    },
-                    # 'required': ['lat', 'lon', 'token']
-                },
-                'end': {
-                    'type': 'object',
-                    'properties': {
-                        'address': {
-                            'type': 'object',
-                            'properties': {
-                                'street': {'type': 'string'},
-                                'location': {
-                                    'type': 'object',
-                                    'properties': {
-                                        'lat': {'type': 'integer'},
-                                        'lon': {'type': 'integer'}
-                                    },
-                                    # 'required': ['lat', 'lon', 'token']
-                                },
-                            },
-                            # 'required': ['lat', 'lon', 'token']
-                        },
-                        # 'timestamp': {'type': 'integer'}
-                    },
-                    # 'required': ['lat', 'lon', 'token']
-                },
-            },
-            # 'required': ['lat', 'lon', 'token']
-        },
-        'paymethod': {
-            'type': 'object',
-            'properties': {
-                'paymethod': {'type': 'string'},
-                # 'parameters': {
-                #     'type': 'object',
-                #     'properties': {
-                #         'MISTICO': {'type': 'string'},  ## ESTA COMO JSON VACIO QUE ONDA?
-                #
-                #     },
-                #     #'required': ['']
-                # }
-            },
-            # 'required': ['lat', 'lon', 'token']
-        },
-    },
-    # 'required': ['lat', 'lon', 'token']
+    'required': ['lat', 'lon']
 }
 
 trips_full_schema = {
@@ -192,145 +82,112 @@ trips_full_schema = {
         'trip': {
             'type': 'object',
             'properties': {
-                'id': {'type': 'string'},
-                'applicationOwner': {'type': 'string'},
-                'driver': {'type': 'string'},
-                'passenger': {'type': 'string'},
-                'start': {
-                    'type': 'object',
-                    'properties': {
-                        'address': {
-                            'type': 'object',
-                            'properties': {
-                                'street': {'type': 'string'},
-                                'location': {
-                                    'type': 'object',
-                                    'properties': {
-                                        'lat': {'type': 'integer'},
-                                        'lon': {'type': 'integer'}
-                                    },
-                                    # 'required': ['lat', 'lon', 'token']
-                                },
-                            },
-                            # 'required': ['lat', 'lon', 'token']
-                        },
-                        'timestamp': {'type': 'integer'}
-                    },
-                    # 'required': ['lat', 'lon', 'token']
+                'legs': {'minItems': 1,
+                        'type': 'array'}
+            #     'bounds': {'type': 'object'},
+            #     "copyrights": {'type': 'object'},
+            #     "overview_polyline": {'type': 'object'},
+            #     "summary": {'type': 'string'},
+            #     "warnings": {'type': 'object'},
+            #     "waypoint_order":{'type': 'object'},
                 },
-                'end': {
-                    'type': 'object',
-                    'properties': {
-                        'address': {
-                            'type': 'object',
-                            'properties': {
-                                'street': {'type': 'string'},
-                                'location': {
-                                    'type': 'object',
-                                    'properties': {
-                                        'lat': {'type': 'integer'},
-                                        'lon': {'type': 'integer'}
-                                    },
-                                    # 'required': ['lat', 'lon', 'token']
-                                },
-                            },
-                            # 'required': ['lat', 'lon', 'token']
-                        },
-                        'timestamp': {'type': 'integer'}
-                    },
-                    # 'required': ['lat', 'lon', 'token']
-                },
-            },
-            # 'required': ['lat', 'lon', 'token']
-        },
-        'totalTime': {'type': 'integer'},  # VER QUE TIPO QUIERE ALAN
-        'waitTime': {'type': 'integer'},
-        'travelTime': {'type': 'integer'},
-        'distance': {'type': 'integer'},
-        # 'route': {'type': 'integer'},  # ?????? VECTOR DE JSON
-        'cost': {
-            'type': 'object',
-            'properties': {
-                'currency': {'type': 'string'},
-                'value': {'type': 'integer'}
-            },
-            # 'required': ['userId', 'authToken']
+            'required': ['legs']
         },
         'paymethod': {
             'type': 'object',
             'properties': {
                 'paymethod': {'type': 'string'},
-                # 'parameters': {
-                #     'type': 'object',
-                #     'properties': {
-                #         'MISTICO': {'type': 'string'},  ## ESTA COMO JSON VACIO QUE ONDA?
-                #
-                #     },
-                #     #'required': ['']
-                # }
             },
-            # 'required': ['lat', 'lon', 'token']
         },
     },
-    # 'required': ['lat', 'lon', 'token']
+    'required': ['trip', 'paymethod']
 }
 
-#     {
-#   "trip": {
-#     "id": "string",
-#     "applicationOwner": "string",
-#     "driver": "string",
-#     "passenger": "string",
-#     "start": {
-#       "address": {
-#         "street": "string",
-#         "location": {
-#           "lat": 0,
-#           "lon": 0
-#         }
-#       },
-#       "timestamp": 0
-#     },
-#     "end": {
-#       "address": {
-#         "street": "string",
-#         "location": {
-#           "lat": 0,
-#           "lon": 0
-#         }
-#       },
-#       "timestamp": 0
-#     },
-#     "totalTime": 0,
-#     "waitTime": 0,
-#     "travelTime": 0,
-#     "distance": 0,
-#     "route": [
-#       {
-#         "location": {
-#           "lat": 0,
-#           "lon": 0
+# trips_full_schema = {
+#     'type': 'object',
+#     'properties': {
+#         'trip': {
+#             'type': 'object',
+#             'properties': {
+#                 'id': {'type': 'string'},
+#                 'applicationOwner': {'type': 'string'},
+#                 'driver': {'type': 'string'},
+#                 'passenger': {'type': 'string'},
+#                 'start': {
+#                     'type': 'object',
+#                     'properties': {
+#                         'address': {
+#                             'type': 'object',
+#                             'properties': {
+#                                 'street': {'type': 'string'},
+#                                 'location': {
+#                                     'type': 'object',
+#                                     'properties': {
+#                                         'lat': {'type': 'integer'},
+#                                         'lon': {'type': 'integer'}
+#                                     },
+#                                     # 'required': ['lat', 'lon', 'token']
+#                                 },
+#                             },
+#                             # 'required': ['lat', 'lon', 'token']
+#                         },
+#                         'timestamp': {'type': 'integer'}
+#                     },
+#                     # 'required': ['lat', 'lon', 'token']
+#                 },
+#                 'end': {
+#                     'type': 'object',
+#                     'properties': {
+#                         'address': {
+#                             'type': 'object',
+#                             'properties': {
+#                                 'street': {'type': 'string'},
+#                                 'location': {
+#                                     'type': 'object',
+#                                     'properties': {
+#                                         'lat': {'type': 'integer'},
+#                                         'lon': {'type': 'integer'}
+#                                     },
+#                                     # 'required': ['lat', 'lon', 'token']
+#                                 },
+#                             },
+#                             # 'required': ['lat', 'lon', 'token']
+#                         },
+#                         'timestamp': {'type': 'integer'}
+#                     },
+#                     # 'required': ['lat', 'lon', 'token']
+#                 },
+#             },
+#             # 'required': ['lat', 'lon', 'token']
 #         },
-#         "timestamp": 0
-#       }
-#     ],
-#     "cost": {
-#       "currency": "string",
-#       "value": 0
-#     }
-#   },
-#   "paymethod": {
-#     "paymethod": "string",
-#     "parameters": {}
-#   }
+#         'totalTime': {'type': 'integer'},  # VER QUE TIPO QUIERE ALAN
+#         'waitTime': {'type': 'integer'},
+#         'travelTime': {'type': 'integer'},
+#         'distance': {'type': 'integer'},
+#         # 'route': {'type': 'integer'},  # ?????? VECTOR DE JSON
+#         'cost': {
+#             'type': 'object',
+#             'properties': {
+#                 'currency': {'type': 'string'},
+#                 'value': {'type': 'integer'}
+#             },
+#             # 'required': ['userId', 'authToken']
+#         },
+#         'paymethod': {
+#             'type': 'object',
+#             'properties': {
+#                 'paymethod': {'type': 'string'},
+#                 # 'parameters': {
+#                 #     'type': 'object',
+#                 #     'properties': {
+#                 #         'MISTICO': {'type': 'string'},  ## ESTA COMO JSON VACIO QUE ONDA?
+#                 #
+#                 #     },
+#                 #     #'required': ['']
+#                 # }
+#             },
+#             # 'required': ['lat', 'lon', 'token']
+#         },
+#     },
+#     # 'required': ['lat', 'lon', 'token']
 # }
-
-location_schema = {
-        'type': 'object',
-        'properties': {
-            'lat': {'type': 'number'},
-            'lon': {'type': 'number'}
-        },
-        'required': ['lat', 'lon']
-    }
-

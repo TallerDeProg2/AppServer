@@ -60,6 +60,6 @@ api.add_resource(directions.GetDirections, '/passengers/<string:id>/directions')
 api.add_resource(query.AvailableDrivers, '/passengers/<string:id>/drivers')
 api.add_resource(query.AvailableTrips, '/drivers/<string:id>/trips')
 
-api.add_resource(match.TripRequest, '/passengers/<string:id>/trips/request')
+api.add_resource(match.TripRequest, '/passengers/<int:id>/trips/request')
 api.add_resource(match.TripEstimate, '/trips/estimate')
 
