@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from src.main import authentication, edit, query, directions, location
+from src.main import authentication, query, directions, location, controller_passenger, controller_car, controller_payment, controller_driver
 from flask import Flask
 from flask_restful import Api
 import logging
@@ -36,15 +36,15 @@ api.add_resource(authentication.HelloWorld, '/hola')
 api.add_resource(authentication.ByeWorld, '/chau')
 api.add_resource(authentication.SignUpUser, '/users')
 
-api.add_resource(edit.EditUser, '/passengers/<string:id>')
-# api.add_resource(edit.EditUser, '/drivers/<string:id>')
-api.add_resource(edit.EditCar, '/drivers/<string:id>/cars')
-api.add_resource(edit.EditPayment, '/passengers/<string:id>/payment')
+api.add_resource(controller_passenger.Passenger, '/passengers/<int:id>')
+api.add_resource(controller_driver.Driver, '/drivers/<int:id>')
+api.add_resource(controller_car.Car, '/drivers/<int:id>/cars')
+api.add_resource(controller_payment.Payment, '/passengers/<int:id>/payment')
 
-api.add_resource(location.LocatePassenger, '/passengers/<string:id>/location')
-api.add_resource(location.LocateDriver, '/drivers/<string:id>/location')
+api.add_resource(location.LocatePassenger, '/passengers/<int:id>/location')
+api.add_resource(location.LocateDriver, '/drivers/<int:id>/location')
 
-api.add_resource(directions.GetDirections, '/passengers/<string:id>/directions')
+api.add_resource(directions.GetDirections, '/passengers/<int:id>/directions')
 
 api.add_resource(query.AvailableDrivers, '/passengers/<string:id>/drivers')
 api.add_resource(query.AvailableTrips, '/drivers/<string:id>/trips')

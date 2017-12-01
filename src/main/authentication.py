@@ -1,21 +1,22 @@
+import logging
+import requests
 from flask import Flask
 from flask_restful import Resource, reqparse, abort
-import requests
-import logging
-from src.main.edit import validate_args
+import src.main.constants.mongo_spec as db
 import src.main.global_method as gm
-import src.main.mongo_spec as db
+import src.main.constants.shared_server as ss
+import src.main.constants.schemas as sch
 
 app = Flask(__name__)
-parser = reqparse.RequestParser()
 
 
 def send_post(endpoint, content):
     try:
-        r = requests.post(endpoint, json=content, headers={'token': ''})
+        r = requests.post(endpoint, json=content, headers={'token': 'superservercito-token'})
         r.raise_for_status()
     except requests.exceptions.HTTPError:
         logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
+        logging.error('     Mensaje: ' + r.content.decode('utf-8', 'ignore'))
         abort(r.status_code)
 
     return r.json()
@@ -32,72 +33,41 @@ class ByeWorld(Resource):
 
 
 class LogIn(Resource):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'fb': {
-                'type': 'object',
-                'properties': {
-                    'userID': {'type': 'string'},
-                    'authToken': {'type': 'string'}
-                },
-                'required': ['userID', 'authToken']
-            },
-        },
-        'required': ['username', 'password', 'fb']
-    }
+    schema = sch.user_reduced_schema
 
     def post(self):
         """Permite loggear un usuario"""
-        content = validate_args(self.schema)
+        content = gm.validate_args(self.schema)
 
-        r = send_post('direccionana/users/validate', content)
+        r = send_post(ss.URL + '/users/validate', content)
 
-        #Crear token
-        token = gm.encode_token(r['id'])
-        r['token'] = token
-        return r, 200
-        # return content
+        token = gm.encode_token(r['user']['id'])
+        response = gm.build_response(r)
+        response['token'] = token
+        return response, 200
 
 
 class SignUpUser(Resource):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'fb': {
-                'type': 'object',
-                'properties': {
-                    'userID': {'type': 'string'},
-                    'authToken': {'type': 'string'}
-                },
-                'required': ['userID', 'authToken']
-            },
-            'firstName': {'type': 'string'},
-            'lastName': {'type': 'string'},
-            'country': {'type': 'string'},
-            'email': {'type': 'string'},
-            'birthdate': {'type': 'string'}
-        },
-        'required': ['username', 'password', 'fb', 'firstName', 'lastName',
-                     'country', 'email', 'birthdate']
-    }
+    schema = sch.user_full_schema
 
     def post(self):
         """Permite registrar un usuario"""
-        content = validate_args(self.schema)
+        content = gm.validate_args(self.schema)
 
-        r = send_post('direccionana/users', content)
+        content['_ref'] = ''
+
+        r = send_post(ss.URL + '/users', content)
 
         if content['type'] == 'passenger':
-            db.passengers.insert_one({'_id': r['id'], 'lat': '', 'lon': ''})
-        # db.passengers.insert_one({'_id': '238932', 'lat': '', 'lon': ''})
+            db.passengers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': ''})
+        elif content['type'] == 'driver':
+            db.drivers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': ''})
         else:
-            db.drivers.insert_one({'_id': r['id'], 'lat': '', 'lon': ''})
+            logging.error('Parámetro type incorrecto: ' + content['type'])
+            abort(400)
 
+        logging.info('Usuario id: ' + repr(r['user']['id']) + ' creado en base ' + content['type'])
+        #TODO: No esta loggeando
+        response = gm.build_response(r)
         return r, 201
-        # return content, 201
 

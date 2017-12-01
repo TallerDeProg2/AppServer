@@ -14,40 +14,44 @@ class TestAuthentication(unittest.TestCase):
             'username': 'pepe',
             'password': 'lalala',
             'fb': {
-                    'userID': 'pepefb',
+                    'userId': 'pepefb',
                     'authToken': '1234'
                 },
-            'firstName': 'SOFIA',
-            'lastName': 'argento',
+            'firstname': 'SOFIA',
+            'lastname': 'argento',
             'country': 'argentina',
             'email': 'pepekpo@gmail.com',
             'birthdate': '27484'
         }
 
         response_shared = {
-            'username': 'pepe',
-            'password': 'lalala',
-            'fb': {
-                    'userID': 'pepefb',
-                    'authToken': '1234'
-                },
-            'firstName': 'SOFIA',
-            'lastName': 'argento',
-            'country': 'argentina',
-            'email': 'pepekpo@gmail.com',
-            'birthdate': '27484',
-            'id': '383948'
+            'user': {
+                'username': 'pepe',
+                'password': 'lalala',
+                '_ref': '7284759248784',
+                'cars': {},
+                'fb': {
+                        'userId': 'pepefb',
+                        'authToken': '1234'
+                    },
+                'firstname': 'SOFIA',
+                'lastname': 'argento',
+                'country': 'argentina',
+                'email': 'pepekpo@gmail.com',
+                'birthdate': '27484',
+                'id': '383948'
+            }
         }
 
         output = [{
             'username': 'pepe',
             'password': 'lalala',
             'fb': {
-                'userID': 'pepefb',
+                'userId': 'pepefb',
                 'authToken': '1234'
             },
-            'firstName': 'SOFIA',
-            'lastName': 'argento',
+            'firstname': 'SOFIA',
+            'lastname': 'argento',
             'country': 'argentina',
             'email': 'pepekpo@gmail.com',
             'birthdate': '27484',

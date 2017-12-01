@@ -1,50 +1,38 @@
-from flask import Flask
-from flask_restful import Resource
-from src.main.edit import validate_token, validate_args
-import src.main.mongo_spec as db
-
+from flask import Flask, request
+from flask_restful import Resource, abort
+import src.main.constants.schemas as sch
+import src.main.constants.mongo_spec as db
+import src.main.global_method as gm
+import logging
 
 app = Flask(__name__)
 
 
-def update_location(schema, collection, id): #Ver si conviene esto o herencia
-    # validate_token(id)
-    content = validate_args(schema)
+def update_location(schema, collection, id):
+    token = request.headers['token']
+    if not gm.validate_token(token, id):
+        logging.error('Token inválido')
+        abort(401)
 
-    collection.update_one({'_id': id},
-                             {'$set': {
+    content = gm.validate_args(schema)
+
+    collection.update_one({'_id': id}, {
+                            '$set': {
                                  'lon': content['lon'],
                                  'lat': content['lat']
-                             }})
+                                 }
+                            })
 
 
 class LocatePassenger(Resource):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'lat': {'type': 'number'},
-            'lon': {'type': 'number'}
-        },
-        'required': ['lat', 'lon']
-    }
-
     def put(self, id):
-        update_location(self.schema, db.passengers, id)
+        update_location(sch.location_schema, db.passengers, id)
         return 200
 
 
 class LocateDriver(Resource):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'lat': {'type': 'number'},
-            'lon': {'type': 'number'}
-        },
-        'required': ['lat', 'lon']
-    }
-
     def put(self, id):
-        update_location(self.schema, db.drivers, id)
+        update_location(sch.location_schema, db.drivers, id)
         return 200
 
 
