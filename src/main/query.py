@@ -24,8 +24,9 @@ class AvailableDrivers(Resource):
             # passenger = db.passengers.find_one({'_id': ObjectId(_id)})
 
             if passenger:
-                repuesta = self._get_drivers_cercanos(passenger)
-                return make_response(jsonify(RESPONSE=repuesta, token=token), 200)
+                respuesta = self._get_drivers_cercanos(passenger)
+                respuesta['token'] = token
+                return make_response(jsonify(respuesta), 200)
 
             logging.error('Id inexistente/no conectado')
             abort(404)
@@ -90,12 +91,13 @@ class AvailableTrips(Resource):
             driver = db.drivers.find_one({'id': id})
 
             if driver:
-                repuesta = self._get_trips(driver)
+                respuesta = self._get_trips(driver)
                 # repuesta = self._get_drivers_cercanos(driver)
-                return make_response(jsonify(RESPONSE=repuesta, token=token), 200)
-
-            logging.error('Id inexistente/no conectado')
-            abort(404)
+                respuesta['token'] = token
+                return make_response(jsonify(respuesta), 200)
+            else:
+                logging.error('Id inexistente/no conectado')
+                abort(404)
 
         else:
             logging.error('Token invalido')
@@ -132,8 +134,13 @@ class AvailableTrips(Resource):
             # todo error si no esta el passagero en base
             if passenger and self._esta_cerca(passenger, driver):
                 # todo ver el tema del id _id si tenemos los dos y no mostramos el dafault de mongo o que ondis
+<<<<<<< Updated upstream
                 # r = self._get_data_user(x['id'])
                 # cercanos.append(jsonify(driver=r, position={'lat': x['lat'], 'lon': x['lon']}))
+=======
+                # r = self._get_data_user(x['_id'])
+                # cercanos.append(jsonify(passenger=r, position={'lat': x['lat'], 'lon': x['lon']}))
+>>>>>>> Stashed changes
                 cercanos.append(x)
         return cercanos
 
