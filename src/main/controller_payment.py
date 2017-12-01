@@ -11,8 +11,8 @@ app = Flask(__name__)
 class Payment(Resource):
     def get(self, id):
         service = gets.Get()
-        return service.get(ss.URL + '/users/' + id + '/payment')
+        return service.get(ss.URL + '/users/' + repr(id) + '/payment')
 
     def put(self, id):
         service = edit.Edit()
-        return service.put(id, ss.URL + '/users/' + id + '/payment', sch.payment_schema)
+        return service.put(id, ss.URL + '/users/' + repr(id) + '/payment', sch.payment_schema)

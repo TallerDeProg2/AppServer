@@ -11,8 +11,8 @@ app = Flask(__name__)
 class Car(Resource):
     def get(self, id):
         service = gets.Get()
-        return service.get(ss.URL + '/users/' + id + '/cars')
+        return service.get(ss.URL + '/users/' + repr(id) + '/cars')
 
     def put(self, id):
         service = edit.Edit()
-        return service.put(id, ss.URL + '/users/' + id + '/cars', sch.car_schema)
+        return service.put(id, ss.URL + '/users/' + repr(id) + '/cars', sch.car_schema)
