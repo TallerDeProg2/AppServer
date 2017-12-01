@@ -67,9 +67,9 @@ class TripRequest(Resource):
         try:
             db.trips.insert_one(trip)
             # content["id"] = content.pop("_id")
-            return True
         except db.errors.DuplicateKeyError:
             return False
+        return True
 
     def _convert_to_trip(self, id_passenger, content):
         trip = {}
