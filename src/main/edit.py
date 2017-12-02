@@ -12,7 +12,7 @@ app = Flask(__name__)
 class Edit(Resource):
     def put(self, id, endpoint, schema):
         """Permite modificar"""
-        # gm.check_token(id)
+        gm.check_token(id)
         content = request.json
         try:
             js.validate(content, schema)
@@ -26,8 +26,6 @@ class Edit(Resource):
         except requests.exceptions.HTTPError:
             logging.error('Conexión con el Shared dio error en get: ' + repr(r.status_code))
             abort(r.status_code)
-
-        print(r.json())
 
         content['_ref'] = r.json()['user']['_ref']
 

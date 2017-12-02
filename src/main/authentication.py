@@ -57,7 +57,6 @@ class SignUpUser(Resource):
         content['_ref'] = ''
 
         r = send_post(ss.URL + '/users', content)
-        print(r)
 
         if content['type'] == 'passenger':
             db.passengers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': ''})
@@ -67,7 +66,7 @@ class SignUpUser(Resource):
             logging.error('Parámetro type incorrecto: ' + content['type'])
             abort(400)
 
-        logging.info('Usuario id: ' + r['user']['id'] + ' creado en base ' + content['type'])
+        logging.info('Usuario id: ' + repr(r['user']['id']) + ' creado en base ' + content['type'])
         #TODO: No esta loggeando
         response = gm.build_response(r)
         return r, 201
