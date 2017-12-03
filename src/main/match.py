@@ -15,20 +15,20 @@ from src.main.constants import mongo_spec as db
 import requests
 import src.main.constants.shared_server as ss
 
-
 app = Flask(__name__)
 
 
 class TripRequest(Resource):
-    schema = sch.trip_request_schema
+    schema = sch.trips_full_schema
 
     def get(self, id):
-        return "todo ok"
+        return "get Trip request"
 
     def post(self, id):
         """Registar una solicitud de viaje"""
-        logging.info("post TripRequest")
+        logging.info("post Trip request")
         token = request.headers['token']
+
         if gm.validate_token(token):
             logging.info("token correcto")
             passenger = db.passengers.find_one({'_id': id})
@@ -36,13 +36,15 @@ class TripRequest(Resource):
             if passenger:
                 logging.info("usuario correcto")
                 content = request.get_json()
+
+                # todo HACER RESPUESTA GENERICA Y RESPONDER CON ESO
                 if self._is_valid_body_request(content):
-                    if self._add_trip_to_db(id, content):
-                        # todo HACER RESPUESTA GENERICA Y RESPONDER CON ESO
-                        content['token'] = token
-                        return make_response(jsonify(content), 201)
+                    trip = self._convert_to_trip(id, content)
+                    if self._add_trip_to_db(trip):
+                            content['token'] = token
+                            return make_response(jsonify(trip), 201)
                     else:
-                        logging.error('Error ya tiene registrada una solicitud de viaje')
+                        logging.error("no se puedo completar la operacion")
                         abort(409)
                 else:
                     logging.error('Argumentos ingresados inválidos')
@@ -62,16 +64,39 @@ class TripRequest(Resource):
             return False
         return True
 
-    def _add_trip_to_db(self, id_passenger, content):
-        # content["_id"] = db.trips.count()+1
-        content["_id"] = id_passenger
+    def _add_trip_to_db(self, trip):
+        trip["_id"] = db.trips.count() + 1
         try:
-            db.trips.insert_one(content)
-            # todo: hacerlo mejor...
-            content["id"] = content.pop("_id")
+            db.trips.insert_one(trip)
+            # content["id"] = content.pop("_id")
             return True
         except db.errors.DuplicateKeyError:
             return False
+
+    def _convert_to_trip(self, id_passenger, content):
+        trip = {}
+        trip["passenger"] = id_passenger
+        trip["driver"] = ""
+        trip["start"] = {}
+        trip["start"]["street"] = content['trip']['legs'][0]['start_address']
+        trip["start"]["location"] = {}
+        trip["start"]["location"]["lat"] = content['trip']['legs'][0]['start_location']['lat']
+        trip["start"]["location"]["lon"] = content['trip']['legs'][0]['start_location']['lng']
+        trip["end"] = {}
+        trip["end"]["street"] = content['trip']['legs'][0]['end_address']
+        trip["end"]["location"] = {}
+        trip["end"]["location"]["lat"] = content['trip']['legs'][0]['end_location']['lat']
+        trip["end"]["location"]["lon"] = content['trip']['legs'][0]['end_location']['lng']
+        trip["totalTime"] = 0
+        trip["waitTime"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        trip["travelTime"] = 0
+        trip["distance"] = 0
+        trip["startTime"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        trip["status"] = "available"
+        trip["cost"] = {}
+        trip["cost"]["currency"] = ""
+        trip["cost"]["value"] = 0
+        return trip
 
 
 #Chofer acepta viaje
@@ -277,7 +302,7 @@ class TripEstimate(Resource):
     def _filter_body(self, content):
         now = datetime.datetime.now()
         travelhour = now.strftime("%Y-%m-%d %H:%M:%S ") + "ART"
-        day = now.strftime("%d") #TODO hacer que no mande el dia en numero
+        day = now.strftime("%A")  # TODO hacer que no mande el dia en numero
         distance = content['trip']['legs'][0]['distance']['value']
         duration = content['trip']['legs'][0]['duration']['value']
         pymethod = content['paymethod']
