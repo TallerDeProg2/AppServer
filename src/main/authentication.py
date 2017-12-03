@@ -57,7 +57,6 @@ class SignUpUser(Resource):
         content['_ref'] = ''
 
         r = send_post(ss.URL + '/users', content)
-        print(r)
 
         if content['type'] == 'passenger':
             db.passengers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': ''})
