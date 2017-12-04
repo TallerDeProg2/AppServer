@@ -86,6 +86,7 @@ class AvailableDrivers(Resource):
 
 
 class AvailableTrips(Resource):
+    max_distance = 1000  # DEBERIA SETEARLA EL PASSENGER
     def get(self, id):
         logging.info("get Available Trips")
         token = request.headers['token']
@@ -132,7 +133,7 @@ class AvailableTrips(Resource):
         # return int(londriver) + int(latdriver)
 
     def _esta_cerca(self, passenger, driver):
-        max_distance = 1000  # DEBERIA SETEARLA EL PASSENGER
+
         if self._calculate_distance(passenger, driver) < max_distance:
             return True
         return False
@@ -143,7 +144,6 @@ class AvailableTrips(Resource):
             passenger = db.passengers.find_one({'_id': x['passenger']})
             if self._is_valid_passenger(passenger) and self._esta_cerca(passenger, driver):
                 r = self._get_data_user(passenger['_id'])
-                #cercanos.append(jsonify(passenger=r, position={'lat': x['lat'], 'lon': x['lon']}))
                 cercanos.append(jsonify(passenger=r, trip=x['directions']))
                 # cercanos.append(x)
         return cercanos
