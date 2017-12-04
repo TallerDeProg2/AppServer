@@ -18,10 +18,10 @@ passenger = {'id': 2, 'lat': 0, 'lon': 0}
 
 driver = {'id': 1, 'lat': 0, 'lon': 0}
 
-trips = [{'id': 1, 'passenger_id': 45, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 3, 'lon': 5}},
-         {'id': 2, 'passenger_id': 4, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 1, 'lon': 2}},
-         {'id': 3, 'passenger_id': 15, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 0, 'lon': 6}},
-         {'id': 4, 'passenger_id': 2, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 0, 'lon': 10}}]
+trips = [{'id': 1, 'passenger': 45, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 3, 'lon': 5}},
+         {'id': 2, 'passenger': 4, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 1, 'lon': 2}},
+         {'id': 3, 'passenger': 15, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 0, 'lon': 6}},
+         {'id': 4, 'passenger': 2, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 0, 'lon': 10}}]
 
 
 # This method will be used by the mock to replace requests.get

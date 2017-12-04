@@ -127,7 +127,7 @@ class AvailableTrips(Resource):
     def _get_trips(self, driver):
         cercanos = []
         for x in db.trips.find():
-            passenger = db.passengers.find({'_id': x['passenger_id']}) #todo ver nombre
+            passenger = db.passengers.find_one({'_id': x['passenger']}) #todo ver nombre
             # todo error si no esta el passagero en base
             if passenger and self._esta_cerca(passenger, driver):
                 # todo ver el tema del id _id si tenemos los dos y no mostramos el dafault de mongo o que ondis

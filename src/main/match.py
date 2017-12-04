@@ -36,12 +36,11 @@ class TripRequest(Resource):
                 logging.info("usuario correcto")
                 content = request.get_json()
 
-                # todo HACER RESPUESTA GENERICA Y RESPONDER CON ESO
                 if self._is_valid_body_request(content):
                     trip = self._convert_to_trip(id, content)
                     if self._add_trip_to_db(trip):
                             content['token'] = token
-                            return make_response(jsonify(trip), 201)
+                            return make_response(jsonify(content), 201)
                     else:
                         logging.error("no se puedo completar la operacion")
                         abort(409)
@@ -95,6 +94,7 @@ class TripRequest(Resource):
         trip["cost"] = {}
         trip["cost"]["currency"] = ""
         trip["cost"]["value"] = 0
+        trip["directions"] = content['trip']
         return trip
 
 
@@ -276,6 +276,8 @@ class TripEnd(Resource):
 
 
 class TripEstimate(Resource):
+    schema = sch.trips_full_schema
+
     def get(self, id):
         return "get Trip estimate"
 
@@ -284,24 +286,28 @@ class TripEstimate(Resource):
         logging.info("post TripEstimate")
         token = request.headers['token']
 
-        # todo FALTAN LAS VALIDACIONES DE LO QUE RECIBO DE ALAN
+
         if gm.validate_token(token):
             logging.info("token correcto")
 
             content = request.get_json()
-            query = self._filter_body(content)
-            response = self._send_query(query)
+            if self._is_valid_body_request(content):
+                query = self._filter_body(content)
+                response = self._send_query(query)
 
-            # todo: ver si solo le mando el costo o algo mas
-            return make_response(jsonify(cost=response['cost'], token=token), 201)
-        else:
-            logging.error('Token invalido')
-            abort(401)
+                # todo: ver si solo le mando el costo o algo mas
+                return make_response(jsonify(cost=response['cost'], token=token), 201)
+
+            logging.error('Argumentos ingresados inválidos')
+            abort(400)
+
+        logging.error('Token invalido')
+        abort(401)
 
     def _filter_body(self, content):
         now = datetime.datetime.now()
         travelhour = now.strftime("%Y-%m-%d %H:%M:%S ") + "ART"
-        day = now.strftime("%A")  # TODO hacer que no mande el dia en numero
+        day = now.strftime("%A")
         distance = content['trip']['legs'][0]['distance']['value']
         duration = content['trip']['legs'][0]['duration']['value']
         pymethod = content['paymethod']
@@ -316,4 +322,11 @@ class TripEstimate(Resource):
             logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
             abort(r.status_code)
         return r.json()
+
+    def _is_valid_body_request(self, body):
+        try:
+            js.validate(body, self.schema)
+        except js.exceptions.ValidationError:
+            return False
+        return True
 
