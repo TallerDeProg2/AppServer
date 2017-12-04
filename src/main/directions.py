@@ -18,14 +18,11 @@ class GetDirections(Resource):
     def post(self, id):
         gm.check_token(id)
         content = request.json
-        try:
-            js.validate(content, self.schema)
-        except js.exceptions.ValidationError:
-            logging.error('Argumentos ingresados inválidos')
+        if not gm.validate_args(self.schema, content):
             abort(400)
 
         origindb = db.passengers.find_one({'_id': id})
-        if origindb == None:
+        if origindb is None:
             logging.error('Id de usuario inexistente')
             abort(404)
         # origindb = {'lat': -34.5903345,
