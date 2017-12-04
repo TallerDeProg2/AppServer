@@ -51,25 +51,18 @@ def validate_token(token, user_id=None):
     return False
 
 
-def validate_args(schema):
-    content = request.json   # Ver si esto bien o mal
+def validate_args(schema, content):
+    ok = True
     try:
         js.validate(content, schema)
     except js.exceptions.ValidationError:
         logging.error('Argumentos ingresados inválidos')
-        abort(400)
+        ok = False
 
-    return content
-
-
-def check_token(id):
-    token = request.headers['token']  # Ver si esto bien o mal
-    if not validate_token(token, id):
-        logging.error('Token inválido')
-        abort(401)
+    return ok
 
 
-def build_response(r): #Meterle el fb o pedirle a ana q lo mande
+def build_response(r): #TODO: Meterle el fb o pedirle a ana q lo mande
     """
         Generates a suitable response for the client
         :param json:

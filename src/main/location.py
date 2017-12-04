@@ -14,7 +14,9 @@ def update_location(schema, collection, id):
         logging.error('Token inválido')
         abort(401)
 
-    content = gm.validate_args(schema)
+    content = request.json
+    if not gm.validate_args(schema, content):
+        abort(400)
 
     collection.update_one({'_id': id}, {
                             '$set': {
