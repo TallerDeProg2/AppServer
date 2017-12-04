@@ -11,7 +11,7 @@ import src.main.global_method as gm
 app = Flask(__name__)
 
 
-class Car(Resource): #TODO: Ver como ana me devuelve las cosa para hacer response
+class Car(Resource):
     def get(self, id):
         token = request.headers['token']
         if not gm.validate_token(token, id):
@@ -19,7 +19,7 @@ class Car(Resource): #TODO: Ver como ana me devuelve las cosa para hacer respons
             abort(401)
         service = gets.Get()
         car = service.get(ss.URL + '/users/' + repr(id) + '/cars')['car']
-        car.pop('_ref')
+        car.pop('_ref') #TODO: Ver si ana SIEMPRE devuelve con ref
         return car
 
     def put(self, id):
@@ -38,5 +38,5 @@ class Car(Resource): #TODO: Ver como ana me devuelve las cosa para hacer respons
             abort(400)
         service = posts.Post()
         car = service.post(ss.URL + '/users/' + repr(id) + '/cars', content)['car']
-        car.pop['_ref']
+        car.pop('_ref')
         return car

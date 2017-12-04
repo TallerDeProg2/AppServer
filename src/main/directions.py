@@ -16,7 +16,10 @@ class GetDirections(Resource):
     schema = sch.location_schema
 
     def post(self, id):
-        gm.check_token(id)
+        token = request.headers['token']
+        if not gm.validate_token(token, id):
+            logging.error('Token inválido')
+            abort(401)
         content = request.json
         if not gm.validate_args(self.schema, content):
             abort(400)
