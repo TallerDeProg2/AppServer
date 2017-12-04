@@ -18,7 +18,8 @@ class Passenger(Resource):
             logging.error('Token invalido')
             abort(401)
         service = gets.Get()
-        return service.get(ss.URL + '/users/' + repr(id))
+        r = service.get(ss.URL + '/users/' + repr(id))
+        return gm.build_response(r)
 
     def put(self, id):
         service = edit.Edit()
