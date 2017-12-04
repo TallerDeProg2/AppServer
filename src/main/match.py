@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# import src.main.constants.shared_server as ss
 import datetime
 import logging
 

@@ -59,7 +59,7 @@ api.add_resource(location.LocateDriver, '/drivers/<int:id>/location')
 api.add_resource(directions.GetDirections, '/passengers/<int:id>/directions')
 
 api.add_resource(query.AvailableDrivers, '/passengers/<int:id>/drivers')
-api.add_resource(query.AvailableTrips, '/drivers/<string:id>/trips')
+api.add_resource(query.AvailableTrips, '/drivers/<int:id>/trips')
 
 api.add_resource(match.TripRequest, '/passengers/<int:id>/trips/request')
 api.add_resource(match.TripEstimate, '/trips/estimate')
