@@ -33,7 +33,19 @@ user_full_schema = {
         'lastname': {'type': 'string'},
         'country': {'type': 'string'},
         'email': {'type': 'string'},
-        'birthdate': {'type': 'string'}
+        'birthdate': {'type': 'string'},
+        'card': {
+                'type': 'object',
+                'properties':{
+                    'ccvv': {'type': 'string'},
+                    'expiration_month': {'type': 'string'},
+                    'expiration_year': {'type': 'string'},
+                    'method': {'type': 'string'},
+                    'number': {'type': 'string'},
+                    'type': {'type': 'string'}
+                    },
+                'required': ['ccvv', 'expiration_month', 'expiration_year', 'method', 'number', 'type']
+                },
     },
     'required': ['type', 'username', 'password', 'fb', 'firstname', 'lastname',
                  'country', 'email', 'birthdate']

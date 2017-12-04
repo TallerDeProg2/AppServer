@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import requests
-
-from src.main import authentication, query, directions, location, controller_passenger, controller_car, controller_payment, controller_driver
 
 from flask import Flask
 from flask_restful import Api
-from flask_restful import abort
 
-from src.main import authentication, edit, query, directions, location, match
+from src.main import authentication, query, directions, location, controller_passenger, controller_car, \
+    controller_payment, controller_driver, match
 
 app = Flask(__name__)
 app.config["token"] = "servercito-token"
@@ -63,4 +60,6 @@ api.add_resource(query.AvailableTrips, '/drivers/<int:id>/trips')
 
 api.add_resource(match.TripRequest, '/passengers/<int:id>/trips/request')
 api.add_resource(match.TripEstimate, '/trips/estimate')
-
+api.add_resource(match.TripConfirmation, '/drivers/<string:id>/trip/confirmation')
+api.add_resource(match.TripStart, '/trips/<int:id>/start')
+api.add_resource(match.TripEnd, '/trips/<int:id>/end')
