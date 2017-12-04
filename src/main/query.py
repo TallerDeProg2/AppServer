@@ -86,7 +86,7 @@ class AvailableDrivers(Resource):
 
 
 class AvailableTrips(Resource):
-    max_distance = 1000  # DEBERIA SETEARLA EL PASSENGER
+    max_distance = 2  # DEBERIA SETEARLA EL PASSENGER
     def get(self, id):
         logging.info("get Available Trips")
         token = request.headers['token']
@@ -118,6 +118,7 @@ class AvailableTrips(Resource):
             Calculate the great circle distance between two points
             on the earth (specified in decimal degrees)
         """
+        logging.info("Calcula distancia entre pasajero y conductor")
         # convert decimal degrees to radians
         londriver, latdriver = driver['lon'], driver['lat']
         lonpassenger, latpassenger = passenger['lon'], passenger['lat']
@@ -130,25 +131,26 @@ class AvailableTrips(Resource):
         c = 2 * asin(sqrt(a))
         km = 6367 * c
         return km
-        # return int(londriver) + int(latdriver)
 
     def _esta_cerca(self, passenger, driver):
-
-        if self._calculate_distance(passenger, driver) < max_distance:
+        logging.info("filtra si estan cerca")
+        if self._calculate_distance(passenger, driver) < self.max_distance:
             return True
         return False
 
     def _get_trips(self, driver):
+        logging.info("obtener los viajes disponibles y choferes mas cercanos")
         cercanos = []
         for x in db.trips.find({'status': 'available'}):
             passenger = db.passengers.find_one({'_id': x['passenger']})
             if self._is_valid_passenger(passenger) and self._esta_cerca(passenger, driver):
                 r = self._get_data_user(passenger['_id'])
+                # x['directions'] porque solo le mando la direccion de google
                 cercanos.append(jsonify(passenger=r, trip=x['directions']))
-                # cercanos.append(x)
         return cercanos
 
     def _get_data_user(self, id):
+        logging.info("pedir informacion del pasajero a shared")
         try:
             r = requests.get(ss.URL + '/users/' + str(id), headers={'token': "superservecito-token"})
             r.raise_for_status()
