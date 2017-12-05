@@ -134,9 +134,7 @@ class AvailableTrips(Resource):
 
     def _esta_cerca(self, passenger, driver):
         logging.info("filtra si estan cerca")
-        if self._calculate_distance(passenger, driver) < self.max_distance:
-            return True
-        return False
+        return  self._calculate_distance(passenger, driver) < self.max_distance
 
     def _get_trips(self, driver):
         logging.info("obtener los viajes disponibles y choferes mas cercanos")
