@@ -1,7 +1,7 @@
 import logging
 import requests
-from flask import Flask
-from flask_restful import Resource, reqparse, abort
+from flask import Flask, request
+from flask_restful import Resource, abort
 import src.main.constants.mongo_spec as db
 import src.main.global_method as gm
 import src.main.constants.shared_server as ss
@@ -37,14 +37,16 @@ class LogIn(Resource):
 
     def post(self):
         """Permite loggear un usuario"""
-        content = gm.validate_args(self.schema)
+        content = request.json
+        if not gm.validate_args(self.schema, content):
+            abort(400)
 
         r = send_post(ss.URL + '/users/validate', content)
 
         token = gm.encode_token(r['user']['id'])
         response = gm.build_response(r)
         response['token'] = token
-        return response, 200
+        return response, 201
 
 
 class SignUpUser(Resource):
@@ -52,7 +54,9 @@ class SignUpUser(Resource):
 
     def post(self):
         """Permite registrar un usuario"""
-        content = gm.validate_args(self.schema)
+        content = request.json
+        if not gm.validate_args(self.schema, content):
+            abort(400)
 
         content['_ref'] = ''
 
@@ -68,6 +72,6 @@ class SignUpUser(Resource):
 
         logging.info('Usuario id: ' + repr(r['user']['id']) + ' creado en base ' + content['type'])
         #TODO: No esta loggeando
-        response = gm.build_response(r)
-        return r, 201
+
+        return gm.build_response(r), 201
 
