@@ -29,7 +29,7 @@ class PassengerPayment(Resource): #TODO: Ver que me devuelve ana y crear respues
         if not gm.validate_args(sch.payment_schema, content):
             abort(400)
         service = posts.Post()
-        return service.post(ss.URL + '/users/' + repr(id) + '/card', content)['card']
+        return service.post(ss.URL + '/users/' + repr(id) + '/card', content)['card'], 201
 
 
 class DriverPayment(Resource):
@@ -50,4 +50,4 @@ class DriverPayment(Resource):
         if not gm.validate_args(sch.payment_schema, content):
             abort(400)
         service = posts.Post()
-        return service.post(ss.URL + '/users/' + repr(id) + '/card', content)['card']
+        return service.post(ss.URL + '/users/' + repr(id) + '/card', content)['card'], 201

@@ -46,7 +46,7 @@ class LogIn(Resource):
         token = gm.encode_token(r['user']['id'])
         response = gm.build_response(r)
         response['token'] = token
-        return response, 200
+        return response, 201
 
 
 class SignUpUser(Resource):
