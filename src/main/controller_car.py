@@ -35,4 +35,4 @@ class Car(Resource):
         service = posts.Post()
         car = service.post(ss.URL + '/users/' + repr(id) + '/cars', content)['car']
         car.pop('_ref')
-        return car
+        return car, 201

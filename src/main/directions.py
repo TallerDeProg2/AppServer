@@ -35,4 +35,4 @@ class GetDirections(Resource):
         destiny = str(content['lat']) + ',' + str(content['lon'])
         directions = gmaps.directions(origin, destiny, alternatives=True)
 
-        return {'routes': directions}
+        return {'routes': directions}, 201
