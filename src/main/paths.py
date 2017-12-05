@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+
 import logging
 
 from flask import Flask
 from flask_restful import Api
 
-from src.main import authentication, query, directions, location, controller_passenger, controller_car, controller_payment, controller_driver, match
+from src.main import authentication, query, directions, location, controller_passenger, controller_car, \
+    controller_payment, controller_driver, match
 
 app = Flask(__name__)
 app.config["token"] = "servercito-token"
@@ -46,15 +48,16 @@ api.add_resource(authentication.SignUpUser, '/users')
 api.add_resource(controller_passenger.Passenger, '/passengers/<int:id>')
 api.add_resource(controller_driver.Driver, '/drivers/<int:id>')
 api.add_resource(controller_car.Car, '/drivers/<int:id>/cars')
-api.add_resource(controller_payment.Payment, '/passengers/<int:id>/payment')
+api.add_resource(controller_payment.PassengerPayment, '/passengers/<int:id>/card')
+api.add_resource(controller_payment.DriverPayment, '/drivers/<int:id>/card')
 
 api.add_resource(location.LocatePassenger, '/passengers/<int:id>/location')
 api.add_resource(location.LocateDriver, '/drivers/<int:id>/location')
 
 api.add_resource(directions.GetDirections, '/passengers/<int:id>/directions')
 
-api.add_resource(query.AvailableDrivers, '/passengers/<string:id>/drivers')
-api.add_resource(query.AvailableTrips, '/drivers/<string:id>/trips')
+api.add_resource(query.AvailableDrivers, '/passengers/<int:id>/drivers')
+api.add_resource(query.AvailableTrips, '/drivers/<int:id>/trips')
 
 api.add_resource(match.TripRequest, '/passengers/<int:id>/trips/request')
 api.add_resource(match.TripEstimate, '/trips/estimate')

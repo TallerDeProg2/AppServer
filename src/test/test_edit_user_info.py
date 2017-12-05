@@ -133,5 +133,5 @@ def test_getting_error_message_when_response_is_not_ok(mock_put, mock_get, mock_
                         content_type='application/json')
     response_json = json.loads(response.get_data())
 
-    assert_list_equal([response_json], error_msg)            # Cambiar esto de list
+    assert_list_equal([response_json], error_msg)
 

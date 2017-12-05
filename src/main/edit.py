@@ -12,12 +12,13 @@ app = Flask(__name__)
 class Edit(Resource):
     def put(self, id, endpoint, schema):
         """Permite modificar"""
-        gm.check_token(id)
+        token = request.headers['token']
+        if not gm.validate_token(token, id):
+            logging.error('Token invalido')
+            abort(401)
+
         content = request.json
-        try:
-            js.validate(content, schema)
-        except js.exceptions.ValidationError:
-            logging.error('Argumentos ingresados inválidos')
+        if not gm.validate_args(schema, content):
             abort(400)
 
         try:
@@ -36,5 +37,5 @@ class Edit(Resource):
             logging.error('Conexión con el Shared dio error en put: ' + repr(r.status_code))
             abort(r.status_code)
 
-        return gm.build_response(r.json())
+        return r.json()
 

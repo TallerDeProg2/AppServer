@@ -16,16 +16,16 @@ class GetDirections(Resource):
     schema = sch.location_schema
 
     def post(self, id):
-        gm.check_token(id)
+        token = request.headers['token']
+        if not gm.validate_token(token, id):
+            logging.error('Token inválido')
+            abort(401)
         content = request.json
-        try:
-            js.validate(content, self.schema)
-        except js.exceptions.ValidationError:
-            logging.error('Argumentos ingresados inválidos')
+        if not gm.validate_args(self.schema, content):
             abort(400)
 
         origindb = db.passengers.find_one({'_id': id})
-        if origindb == None:
+        if origindb is None:
             logging.error('Id de usuario inexistente')
             abort(404)
         # origindb = {'lat': -34.5903345,
@@ -35,4 +35,4 @@ class GetDirections(Resource):
         destiny = str(content['lat']) + ',' + str(content['lon'])
         directions = gmaps.directions(origin, destiny, alternatives=True)
 
-        return {'routes': directions}
+        return {'routes': directions}, 201
