@@ -25,10 +25,6 @@ class PassengerPayment(Resource): #TODO: Ver que me devuelve ana y crear respues
         return service.put(id, ss.URL + '/users/' + repr(id) + '/card', sch.payment_schema)['card']
 
     def post(self, id):
-        token = request.headers['token']
-        if not gm.validate_token(token, id):
-            logging.error('Token invalido')
-            abort(401)
         content = request.json
         if not gm.validate_args(sch.payment_schema, content):
             abort(400)
@@ -50,10 +46,6 @@ class DriverPayment(Resource):
         return service.put(id, ss.URL + '/users/' + repr(id) + '/card', sch.payment_schema)['card']
 
     def post(self, id):
-        token = request.headers['token']
-        if not gm.validate_token(token, id):
-            logging.error('Token invalido')
-            abort(401)
         content = request.json
         if not gm.validate_args(sch.payment_schema, content):
             abort(400)

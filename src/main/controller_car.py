@@ -29,10 +29,6 @@ class Car(Resource):
         return car
 
     def post(self, id):
-        token = request.headers['token']
-        if not gm.validate_token(token, id):
-            logging.error('Token invalido')
-            abort(401)
         content = request.json
         if not gm.validate_args(sch.car_schema, content):
             abort(400)
