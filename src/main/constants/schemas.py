@@ -16,28 +16,28 @@ user_reduced_schema = {
 }
 
 user_full_schema = {
-        'type': 'object',
-        'properties': {
-            'type': {'type': 'string'},
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'fb': {
-                'type': 'object',
-                'properties': {
-                    'userId': {'type': 'string'},
-                    'authToken': {'type': 'string'}
-                },
-                'required': ['userId', 'authToken']
+    'type': 'object',
+    'properties': {
+        'type': {'type': 'string'},
+        'username': {'type': 'string'},
+        'password': {'type': 'string'},
+        'fb': {
+            'type': 'object',
+            'properties': {
+                'userId': {'type': 'string'},
+                'authToken': {'type': 'string'}
             },
-            'firstname': {'type': 'string'},
-            'lastname': {'type': 'string'},
-            'country': {'type': 'string'},
-            'email': {'type': 'string'},
-            'birthdate': {'type': 'string'}
+            'required': ['userId', 'authToken']
         },
-        'required': ['type', 'username', 'password', 'fb', 'firstname', 'lastname',
-                     'country', 'email', 'birthdate']
-    }
+        'firstname': {'type': 'string'},
+        'lastname': {'type': 'string'},
+        'country': {'type': 'string'},
+        'email': {'type': 'string'},
+        'birthdate': {'type': 'string'},
+    },
+    'required': ['type', 'username', 'password', 'fb', 'firstname', 'lastname',
+                 'country', 'email', 'birthdate']
+}
 
 car_schema = {
         'type': 'object',
@@ -57,15 +57,16 @@ car_schema = {
 
 payment_schema = {
         'type': 'object',
-        'properties': {
-            'name': {'type': 'string'},
+        'properties':{
+            'ccvv': {'type': 'string'},
+            'expiration_month': {'type': 'string'},
+            'expiration_year': {'type': 'string'},
+            'method': {'type': 'string'},
             'number': {'type': 'string'},
-            'type': {'type': 'string'},
-            'expirationmonth': {'type': 'string'},
-            'expirationyear': {'type': 'string'}
-        },
-        'required': ['name', 'number', 'type', 'expirationmonth', 'expirationyear']
-    }
+            'type': {'type': 'string'}
+            },
+        'required': ['ccvv', 'expiration_month', 'expiration_year', 'method', 'number', 'type']
+        }
 
 
 location_schema = {
