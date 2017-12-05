@@ -130,7 +130,7 @@ class AvailableTrips(Resource):
             if self._is_valid_passenger(passenger) and self._esta_cerca(passenger, driver):
                 r = self._get_data_user(passenger['_id'])
                 # x['directions'] porque solo le mando la direccion de google
-                cercanos.append(jsonify(passenger=r, trip=x['directions']))
+                cercanos.append(jsonify(passenger=r, trip=x['directions'], id=x['_id']))
         return cercanos
 
     def _get_data_user(self, id):
