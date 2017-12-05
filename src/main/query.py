@@ -162,3 +162,31 @@ class AvailableTrips(Resource):
 
     def _is_valid_passenger(self, passenger):
         return passenger and passenger['lat'] != "" and passenger['lon'] != ""
+
+
+class TripHistory(Resource):
+    def get(self, id):
+        logging.info("get Trip History")
+        token = request.headers['token']
+
+        if gm.validate_token(token, id):
+            logging.info("token correcto")
+            driver = db.drivers.find_one({'_id': id})
+
+            if driver:
+                respuesta = self._get_trips(id)
+                return make_response(jsonify(trips=respuesta, token=token), 200)
+            logging.error('Id inexistente/no conectado')
+            abort(404)
+
+        else:
+            logging.error('Token inválido')
+            abort(401)
+
+
+    def _get_trips(self, id):
+        logging.info("Obtener el historial de viajes del usuario")
+        trip_history = []
+        for x in db.trips.find({'_id': id, 'status': 'finished'}):
+            trip_history.append(x)
+        return trip_history
