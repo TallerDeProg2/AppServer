@@ -5,7 +5,7 @@ import logging
 
 import jsonschema as js
 import requests
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response, Response
 from flask_restful import Resource, abort
 
 import src.main.constants.schemas as sch
@@ -122,7 +122,7 @@ class TripConfirmation(Resource):
         db.trips.update_one({'_id': content['trip']['id']}, {
             '$set': {
                 'driver': id,
-                'status': 'InProgress'
+                'status': 'inProgress'
             }
         })
         db.drivers.update_one({'_id': id}, {
@@ -131,8 +131,7 @@ class TripConfirmation(Resource):
             }
         })
 
-
-        return 201
+        return Response(status=201)
 
 
 class TripStart(Resource):
@@ -159,7 +158,7 @@ class TripStart(Resource):
                 'startTime': start_time
             }
         })
-        return 201
+        return Response(status=201)
 
 
 class TripEnd(Resource):
@@ -178,15 +177,7 @@ class TripEnd(Resource):
         trip = db.trips.find_one({'_id': id})
 
         if paymethod == 'cash':
-            # properties = {}
-            properties = {'ccvv': '123',
-                          'expiration_month': '12',
-                          'expiration_year': '19',
-                          'method': 'card',
-                          'number': '73832728742',
-                          'type': 'visa'
-                          }
-            paymethod = 'card' #TODO Para probar hasta que ana termine
+            properties = {}
         elif paymethod == 'card':
             properties = self.get_card(trip['passenger'])
         else:
@@ -199,28 +190,18 @@ class TripEnd(Resource):
 
         cost = self.get_cost(trip['distance'], trip_time, paymethod, start_datetime, trip['startTime'])
         self.post_trip(trip, cost, trip_time, paymethod, properties)
-        #TODO Probar con buen internet
+        self.update_db(trip)
 
-        db.drivers.update_one({'_id': trip['driver']}, {
-            '$set': {
-                'available': True
-            }
-        })
-        db.trips.update_one({'_id': id}, {
-            '$set': {
-                'status': 'finished'
-            }
-        })
-        return 201
+        return Response(status=201)
 
     def get_card(self, id_passenger):
         try:
-            r = requests.get(ss.URL + '/user/' + str(id_passenger), headers={'token': 'superservercito-token'})
+            r = requests.get(ss.URL + '/users/' + str(id_passenger) + '/card', headers={'token': 'superservercito-token'})
             r.raise_for_status()
         except requests.exceptions.HTTPError:
             logging.error('Conexión con el Shared dio error en post: ' + repr(r.status_code))
             abort(r.status_code)
-        return r['user']['card']
+        return r.json()['card']
 
     def get_cost(self, distance, trip_time, paymethod, start_datetime, start_time):
         payload = {
@@ -239,8 +220,8 @@ class TripEnd(Resource):
         return r.json()['cost']
 
     def post_trip(self, trip, cost, trip_time, paymethod, properties):
+        ok = False
         trip['cost'] = cost
-        trip['cost']['currency'] = 'ARS'  # TODO Hasta que ana arregle heroku
         trip['travelTime'] = trip_time
         trip['totalTime'] = trip_time + trip['waitTime']
         paymethod_json = {'paymethod': paymethod,
@@ -255,14 +236,14 @@ class TripEnd(Resource):
                 logging.error('Conexión con el Shared dio error en /trips: ' + repr(r.status_code))
                 abort(r.status_code)
             else:
-                self.post_transaction(trip) #TODO: tengo que pegarle hasta que ande?
+                while not ok:
+                    ok = self.post_transaction(trip)
 
     def post_transaction(self, trip):
         payment_json = {'trip': trip['_id'],
                         'payment': {'value': trip['cost']['value'],
                                     'transaction_id': '',
-                                    # 'currency': trip['cost']['currency'],
-                                    'currency': 'ARS',
+                                    'currency': trip['cost']['currency'],
                                     'paymethod': trip['paymethod']['parameters']
                                     }
                         }
@@ -271,9 +252,28 @@ class TripEnd(Resource):
                               headers={'token': 'superservercito-token'})
             r.raise_for_status()
         except requests.exceptions.HTTPError:
-            logging.error('Conexión con el Shared dio error en /users/' +
-                          repr(trip['passenger']) + '/transactions: ' + repr(r.status_code))
-            abort(r.status_code)
+            if r.status_code == 503:
+                return False
+            else:
+                logging.error('Conexión con el Shared dio error en /users/' +
+                              repr(trip['passenger']) + '/transactions: ' + repr(r.status_code))
+                abort(r.status_code)
+        return True
+
+    def update_db(self, trip):
+        db.drivers.update_one({'_id': trip['driver']}, {
+            '$set': {
+                'available': True
+            }
+        })
+        db.trips.update_one({'_id': trip['_id']}, {
+            '$set': {
+                'status': 'finished',
+                'travelTime': trip['travelTime'],
+                'totalTime': trip['totalTime'],
+                'cost': trip['cost']
+            }
+        })
 
 
 class TripEstimate(Resource):

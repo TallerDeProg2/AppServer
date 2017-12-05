@@ -58,7 +58,7 @@ api.add_resource(query.AvailableTrips, '/drivers/<string:id>/trips')
 
 api.add_resource(match.TripRequest, '/passengers/<int:id>/trips/request')
 api.add_resource(match.TripEstimate, '/trips/estimate')
-api.add_resource(match.TripConfirmation, '/drivers/<string:id>/trip/confirmation')
+api.add_resource(match.TripConfirmation, '/drivers/<int:id>/trip/confirmation')
 api.add_resource(match.TripStart, '/trips/<int:id>/start')
 api.add_resource(match.TripEnd, '/trips/<int:id>/end')
 
