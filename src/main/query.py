@@ -48,6 +48,7 @@ class AvailableDrivers(Resource):
         lonpassenger, latpassenger = passenger['lon'], passenger['lat']
         lon_p, lat_p, lon_d, lat_d = map(radians,
                                          [float(lonpassenger), float(latpassenger), float(londriver), float(latdriver)])
+
         lon_distance = lon_d - lon_p
         lat_distance = lat_d - lat_p
         a = sin(lat_distance / 2) ** 2 + cos(lat_p) * cos(lat_d) * sin(lon_distance / 2) ** 2
@@ -61,9 +62,10 @@ class AvailableDrivers(Resource):
             if self._calculate_distance(passenger, x) < self.max_distance:
                 r = self._get_data_user(x['id'])
                 cercanos.append(jsonify(driver=r, position={'lat': x['lat'], 'lon': x['lon']}))
+
         return cercanos
 
-    def _get_data_user(self, id):
+    def _get_data_user(self, _id):
         try:
             r = requests.get(ss.URL + '/users/' + str(id), headers={'token': "superservecito-token"})
             r.raise_for_status()
@@ -112,6 +114,7 @@ class AvailableTrips(Resource):
         lonpassenger, latpassenger = passenger['lon'], passenger['lat']
         lon_p, lat_p, lon_d, lat_d = map(radians,
                                          [float(lonpassenger), float(latpassenger), float(londriver), float(latdriver)])
+
         lon_distance = lon_d - lon_p
         lat_distance = lat_d - lat_p
         a = sin(lat_distance / 2) ** 2 + cos(lat_p) * cos(lat_d) * sin(lon_distance / 2) ** 2
@@ -131,7 +134,7 @@ class AvailableTrips(Resource):
             if self._is_valid_passenger(passenger) and self._esta_cerca(passenger, driver):
                 r = self._get_data_user(passenger['_id'])
                 # x['directions'] porque solo le mando la direccion de google
-                cercanos.append(jsonify(passenger=r, trip=x['directions']))
+                cercanos.append(jsonify(passenger=r, trip=x['directions'], id=x['_id']))
         return cercanos
 
     def _get_data_user(self, id):
