@@ -94,12 +94,13 @@ trips_full_schema = {
                 },
             'required': ['legs']
         },
-        'paymethod': {
-            'type': 'object',
-            'properties': {
-                'paymethod': {'type': 'string'},
-            },
-        },
+        'paymethod': {'type': 'string'}
+            # {
+            # 'type': 'object',
+            # 'properties': {
+            #     'paymethod': {'type': 'string'},
+            # },
+        # },
     },
     'required': ['trip', 'paymethod']
 }
