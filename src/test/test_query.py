@@ -84,7 +84,7 @@ class TestAvailableDrivers(unittest.TestCase):
             mock_mongoD.find.return_value = drivers
             # mock_mr.return_value = mocked_make_response()
 
-            response = service.get("2")
+            response = service.get(2)
 
             self.assertFalse(False)
 
