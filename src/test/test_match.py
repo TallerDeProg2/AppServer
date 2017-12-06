@@ -71,18 +71,15 @@ def test_getting_user_when_response_is_ok(mock_post, mock_get, mock_validate_tok
     mock_get.return_value = Mock(ok=True)
     mock_get.return_value.json.return_value = card
 
-    mock_post.return_value = Mock(ok=True)
-    # mock_post.return_value.json.return_value = modified_user
+    mock_post = Mock(ok=True)
 
     mock_response = Mock()
     mock_response.status_code = 200
 
-    # mock_put.return_value = mock_response
     mock_post.side_effect = [cost, mock_response]
 
     app2 = app.test_client()
     response = app2.post('/trips/20/end', data=json.dumps(args), headers=header,
                         content_type='application/json')
-    response_json = json.loads(response.get_data())
 
     assert_list_equal([response.status_code], [201])
