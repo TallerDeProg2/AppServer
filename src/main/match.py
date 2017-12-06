@@ -291,12 +291,10 @@ class TripEstimate(Resource):
             logging.info("token correcto")
 
             content = request.get_json()
-            print ("")
-            print("ALAN NOS MASNDA: ", content)
-            print ("")
             if self._is_valid_body_request(content):
                 query = self._filter_body(content)
                 response = self._send_query(query)
+
                 # todo: ver si solo le mando el costo o algo mas
                 return make_response(jsonify(cost=response['cost'], token=token), 201)
 
