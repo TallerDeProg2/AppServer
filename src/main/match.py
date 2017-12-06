@@ -227,16 +227,8 @@ class TripEnd(Resource):
                           'parameters': properties}
         trip['paymethod'] = paymethod_json
 
-        try:
-            r = requests.post(ss.URL + '/trips', json=trip, headers={'token': 'superservercito-token'})
-            r.raise_for_status()
-        except requests.exceptions.HTTPError:
-            if r.status_code != 503:
-                logging.error('Conexión con el Shared dio error en /trips: ' + repr(r.status_code))
-                abort(r.status_code)
-            else:
-                while not ok:
-                    ok = self.post_transaction(trip)
+        while not ok:
+            ok = self.post_transaction(trip)
 
     def post_transaction(self, trip):
         payment_json = {'trip': trip['_id'],
