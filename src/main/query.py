@@ -25,7 +25,8 @@ class AvailableDrivers(Resource):
             passenger = db.passengers.find_one({'_id': id})
 
             if passenger and passenger['lat'] != "" and passenger['lon'] != "":
-                respuesta = self._get_drivers_cercanos(passenger)
+                respuesta = {}
+                respuesta['drivers'] = self._get_drivers_cercanos(passenger)
                 respuesta['token'] = token
                 return make_response(jsonify(drivers=respuesta, token=token), 200)
 
