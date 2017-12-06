@@ -166,10 +166,10 @@ class TripEnd(Resource):
             Updates waiting time and start time
 
          """
-        token = request.headers['token']
-        if not gm.validate_token(token, id):
-            logging.error('Token inválido')
-            abort(401)
+        # token = request.headers['token']
+        # if not gm.validate_token(token, id):
+        #     logging.error('Token inválido')
+        #     abort(401)
 
         content = request.json
         paymethod = content['paymethod']
@@ -200,6 +200,7 @@ class TripEnd(Resource):
         except requests.exceptions.HTTPError:
             logging.error('Conexión con el Shared dio error en post: ' + repr(r.status_code))
             abort(r.status_code)
+        print(r.json())
         return r.json()['card']
 
     def get_cost(self, distance, trip_time, paymethod, start_datetime, start_time):
@@ -216,6 +217,7 @@ class TripEnd(Resource):
         except requests.exceptions.HTTPError:
             logging.error('Conexión con el Shared dio error en post: ' + repr(r.status_code))
             abort(r.status_code)
+        print(r.json())
         return r.json()['cost']
 
     def post_trip(self, trip, cost, trip_time, paymethod, properties):
@@ -229,7 +231,7 @@ class TripEnd(Resource):
 
         try:
             r = requests.post(ss.URL + '/trips', json=trip, headers={'token': 'superservercito-token'})
-            r.raise_for_status()
+            r.raise_for_status()  # TODO: Ver si cambiar o no para cash
         except requests.exceptions.HTTPError:
             if r.status_code != 503:
                 logging.error('Conexión con el Shared dio error en /trips: ' + repr(r.status_code))
