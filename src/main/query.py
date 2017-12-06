@@ -85,16 +85,9 @@ class AvailableTrips(Resource):
             logging.info("token correcto")
             driver = db.drivers.find_one({'_id': id})
 
-            if driver:
-                if driver['lat'] != "" and driver['lon'] != "":
+            if driver and driver['lat'] != "" and driver['lon'] != "":
                     respuesta = self._get_trips(driver)
-                    # repuesta = self._get_drivers_cercanos(driver)
-                    # respuesta['token'] = token
                     return make_response(jsonify(trips=respuesta, token=token), 200)
-                else:
-                    logging.error('sin ubicacion')
-                    # TODO ver que error corresponde aca y el de arriba
-                    abort(400)
 
             logging.error('Id inexistente/no conectado')
             abort(404)

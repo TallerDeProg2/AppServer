@@ -204,19 +204,21 @@ class TestAvailableTrips(unittest.TestCase):
             mock_abort.assert_called_with(404)
             # mock_abort.assert_called_with(401)
 
-    # @patch('src.main.constants.mongo_spec.passengers')
-    # @patch('src.main.constants.mongo_spec.trips')
-    # def test_get_drivers_cercanos(self, mock_mongoT, mock_mongoP):
-    #     with app.app_context():
-    #         service = AvailableTrips()
-    #
-    #         mock_mongoT.find.return_value = trips
-    #         mock_mongoP.find.return_value = passenger
-    #         service._get_data_user = MagicMock(return_value=passenger)
-    #         #r = passenger
-    #         cercanos = service._get_trips(driver)
-    #
-    #         self.assertEqual(cercanos, trips)
+    @patch('src.main.query.jsonify', side_effect=mocked_make_response)
+    @patch('src.main.query.AvailableTrips._get_data_user', return_value={'dataUser': 'data'})
+    @patch('src.main.constants.mongo_spec.passengers.find_one', return_value=passenger)
+    @patch('src.main.constants.mongo_spec.trips')
+    def test_get_trips(self, mock_mongoT, mock_mongoP, mock_data, mock_jsonify):
+        with app.app_context():
+            service = AvailableTrips()
+
+            mock_mongoT.find.return_value = trips
+            mock_mongoP.find.return_value = passenger
+            service._get_data_user = MagicMock(return_value=passenger)
+            #r = passenger
+            cercanos = service._get_trips(driver)
+
+            self.assertEqual(cercanos.__len__(), 0)
 
     # @patch('src.main.query.requests.get', side_effect=mocked_requests_get)
     # def test_get_data_user_ok(self, mock_request):
