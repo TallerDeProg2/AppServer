@@ -13,7 +13,7 @@ class Post(Resource):
             r = requests.post(endpoint, json=payload, headers={'token': 'superservercito-token'})
             r.raise_for_status()
         except requests.exceptions.HTTPError:
-            #logging.error('Conexión con el Shared dio error en ' + endpoint + ': ' + repr(r.status_code))
+            logging.error('Conexión con el Shared dio error en ' + endpoint + ': ' + repr(r.status_code))
             abort(r.status_code)
         return r.json()
 
