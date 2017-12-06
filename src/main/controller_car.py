@@ -29,14 +29,10 @@ class Car(Resource):
         return car
 
     def post(self, id):
-        token = request.headers['token']
-        if not gm.validate_token(token, id):
-            logging.error('Token invalido')
-            abort(401)
         content = request.json
         if not gm.validate_args(sch.car_schema, content):
             abort(400)
         service = posts.Post()
         car = service.post(ss.URL + '/users/' + repr(id) + '/cars', content)['car']
         car.pop('_ref')
-        return car
+        return car, 201
