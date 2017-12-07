@@ -61,7 +61,7 @@ class AvailableDrivers(Resource):
         cercanos = []
         for x in db.drivers.find({'available': True}):
             if self._calculate_distance(passenger, x) < self.max_distance:
-                r = self._get_data_user(x['id'])
+                r = self._get_data_user(x['_id'])
                 cercanos.append({'driver': r['user'], 'position': {'lat': x['lat'], 'lon': x['lon']}})
 
         return cercanos
