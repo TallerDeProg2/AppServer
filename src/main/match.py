@@ -39,8 +39,7 @@ class TripRequest(Resource):
                 if self._is_valid_body_request(content):
                     trip = self._convert_to_trip(id, content)
                     if self._add_trip_to_db(trip):
-                            content['token'] = token
-                            return make_response(jsonify(content), 201)
+                            return make_response(jsonify(trip_id=trip['_id']), 201)
                     else:
                         logging.error("no se puedo completar la operacion")
                         abort(409)
