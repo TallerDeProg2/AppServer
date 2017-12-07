@@ -39,8 +39,7 @@ class TripRequest(Resource):
                 if self._is_valid_body_request(content):
                     trip = self._convert_to_trip(id, content)
                     if self._add_trip_to_db(trip):
-                            content['token'] = token
-                            return make_response(jsonify(content), 201)
+                            return make_response(jsonify(trip_id=trip['_id']), 201)
                     else:
                         logging.error("no se puedo completar la operacion")
                         abort(409)
@@ -227,16 +226,8 @@ class TripEnd(Resource):
                           'parameters': properties}
         trip['paymethod'] = paymethod_json
 
-        try:
-            r = requests.post(ss.URL + '/trips', json=trip, headers={'token': 'superservercito-token'})
-            r.raise_for_status()
-        except requests.exceptions.HTTPError:
-            if r.status_code != 503:
-                logging.error('Conexión con el Shared dio error en /trips: ' + repr(r.status_code))
-                abort(r.status_code)
-            else:
-                while not ok:
-                    ok = self.post_transaction(trip)
+        while not ok:
+            ok = self.post_transaction(trip)
 
     def post_transaction(self, trip):
         payment_json = {'trip': trip['_id'],
