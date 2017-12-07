@@ -29,7 +29,7 @@ class AvailableDrivers(Resource):
                 respuesta = {}
                 respuesta['drivers'] = self._get_drivers_cercanos(passenger)
                 respuesta['token'] = token
-                return make_response(jsonify(drivers=respuesta, token=token), 200)
+                return make_response(jsonify(respuesta), 200)
 
             logging.error('Id inexistente/no conectado')
             abort(404)
@@ -63,7 +63,7 @@ class AvailableDrivers(Resource):
             if self._calculate_distance(passenger, x) < self.max_distance:
                 r = self._get_data_user(x['_id'])
                 cercanos.append({'driver': r['user'], 'position': {'lat': x['lat'], 'lon': x['lon']}})
-
+        print (cercanos)
         return cercanos
 
     def _get_data_user(self, _id):
