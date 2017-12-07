@@ -106,7 +106,7 @@ class TripConfirmation(Resource):
 
         """
         token = request.headers['token']
-        if not gm.validate_token(token, id):
+        if not gm.validate_token(token):
             logging.error('Token inválido')
             abort(401)
 
@@ -139,7 +139,7 @@ class TripStart(Resource):
 
          """
         token = request.headers['token']
-        if not gm.validate_token(token, id):
+        if not gm.validate_token(token):
             logging.error('Token inválido')
             abort(401)
 
@@ -166,7 +166,7 @@ class TripEnd(Resource):
 
          """
         token = request.headers['token']
-        if not gm.validate_token(token, id):
+        if not gm.validate_token(token):
             logging.error('Token inválido')
             abort(401)
 
