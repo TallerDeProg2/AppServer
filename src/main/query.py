@@ -133,7 +133,7 @@ class AvailableTrips(Resource):
     def _get_data_user(self, id):
         logging.info("pedir informacion del pasajero a shared")
         try:
-            r = requests.get(ss.URL + '/users/' + str(id), headers={'token': "superservecito-token"})
+            r = requests.get(ss.URL + '/users/' + str(id), headers={'token': "superservercito-token"})
             r.raise_for_status()
         except requests.exceptions.HTTPError:
             logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
