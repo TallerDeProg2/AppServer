@@ -1,16 +1,16 @@
 from pyfcm import FCMNotification
 
-api_key = 'AAAAaxCakgY:APA91bG4JlqQn6YhGAoPck1_moeHW4PxUWiPxnjEmxqfbVLTCVk7Wfn6fOq7AR7b_zPBF0oR9ln-d1maLH5ZoqbFea0eEl0O10RHUYyljyztqkwJEq46kZwVgKgt377PwVH00pjR87i4'
+api_keys = 'AAAAaxCakgY:APA91bG4JlqQn6YhGAoPck1_moeHW4PxUWiPxnjEmxqfbVLTCVk7Wfn6fOq7AR7b_zPBF0oR9ln-d1maLH5ZoqbFea0eEl0O10RHUYyljyztqkwJEq46kZwVgKgt377PwVH00pjR87i4'
 
-push_service = FCMNotification(api_key="<api-key>")
+push_service = FCMNotification(api_key=api_keys)
 
 # OR initialize with proxies
 
-proxy_dict = {
-    "http": "http://127.0.0.1",
-    "https": "http://127.0.0.1",
-}
-push_service = FCMNotification(api_key="<api-key>", proxy_dict=proxy_dict)
+# proxy_dict = {
+#     "http": "http://127.0.0.1",
+#     "https": "http://127.0.0.1",
+# }
+# push_service = FCMNotification(api_key=api_keys, proxy_dict=proxy_dict)
 
 # Your api-key can be gotten from:  https://console.firebase.google.com/project/<project-name>/settings/cloudmessaging
 
