@@ -1,7 +1,15 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, errors
 
 client = MongoClient('mongodb://sofafafa:sofafafa1@ds141098.mlab.com:41098/ubre')
-db = client['ubre']
-drivers = db['drivers_test']
-passengers = db['passengers_test']
-trips = db['available_trips_test']
+dbA = client['ubre']
+drivers = dbA['drivers_test']
+passengers = dbA['passengers_test']
+trips = dbA['available_trips_test']
+errors = errors
+#
+# from pymongo import MongoClient
+#
+# client = MongoClient('localhost', 27017)
+#
+# passengers = client.passengers_test.passengers_test
+# drivers = client.passengers_test.drivers_test
