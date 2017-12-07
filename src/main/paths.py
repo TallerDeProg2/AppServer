@@ -13,7 +13,8 @@ app.config["token"] = "servercito-token"
 
 logging.basicConfig(format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     filename='ubreLogs.log',
-                    filemode='w')
+                    filemode='w',
+                    level=logging.DEBUG)
 
 errors = {
     'BadRequest': {

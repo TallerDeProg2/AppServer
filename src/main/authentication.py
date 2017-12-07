@@ -29,6 +29,10 @@ class HelloWorld(Resource):
 
 class ByeWorld(Resource):
     def get(self):
+        logging.info("se loggea el chau")
+        logging.error("Ahora un error")
+        logging.warning("Ahora un warning")
+        logging.debug("Ahora sale el debug")
         return "Chau"
 
 
