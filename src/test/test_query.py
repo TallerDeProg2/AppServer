@@ -123,7 +123,7 @@ class TestAvailableDrivers(unittest.TestCase):
             mock_abort.assert_called_with(401)
 
     @patch('src.main.query.jsonify', side_effect=mocked_make_response)
-    @patch('src.main.query.AvailableDrivers._get_data_user', return_value={'dataUser': 'data'})
+    @patch('src.main.query.AvailableDrivers._get_data_user', return_value={'user': 'data'})
     @patch('src.main.constants.mongo_spec.drivers')
     def test_get_drivers_cercanos(self, mock_mongoD, mock_dataUser, mock_jsonify):
         with app.app_context():

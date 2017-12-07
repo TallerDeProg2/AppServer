@@ -65,7 +65,7 @@ class SignUpUser(Resource):
         if content['type'] == 'passenger':
             db.passengers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': ''})
         elif content['type'] == 'driver':
-            db.drivers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': ''})
+            db.drivers.insert_one({'_id': r['user']['id'], 'lat': '', 'lon': '', 'available': True})
         else:
             logging.error('Parámetro type incorrecto: ' + content['type'])
             abort(400)
