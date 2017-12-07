@@ -35,6 +35,10 @@ errors = {
     'Conflict': {
         'message': "Solicitud no pudo ser procesada por conflicto de recursos",
         'status': 409
+    },
+    'Forbidden': {
+        'message': "El token del servidor no esta autorizado",
+        'status': 403
     }
 }
 # TODO generalizar los endpoints con plural o singular
