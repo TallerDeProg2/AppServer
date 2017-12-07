@@ -150,7 +150,8 @@ class TestAvailableDrivers(unittest.TestCase):
 
         r = service._get_data_user('2')
 
-        mock_abort.assert_called_with(r.status_code)
+        # mock_abort.assert_called_with(r.status_code)
+        mock_abort.assert_called()
 
 
 class TestAvailableTrips(unittest.TestCase):
@@ -235,7 +236,8 @@ class TestAvailableTrips(unittest.TestCase):
 
         r = service._get_data_user('2')
 
-        mock_abort.assert_called_with(r.status_code)
+        # mock_abort.assert_called_with(r['status_code'])
+        mock_abort.assert_called()
 
 
 if __name__ == '__main__':
