@@ -117,7 +117,7 @@ class TripConfirmation(Resource):
         #     logging.error('Argumentos ingresados inválidos')
         #     abort(400)
 
-        db.trips.update_one({'_id': content['trip']['id']}, {
+        db.trips.update_one({'_id': content['trip_id']}, {
             '$set': {
                 'driver': id,
                 'status': 'inProgress'
