@@ -19,6 +19,8 @@ message_title = "Uber update"
 message_body = "Hi john, your customized news for today is ready"
 result = push_service.notify_single_device(registration_id=registration_id, message_title=message_title,
                                            message_body=message_body)
+# Tengo que acordar un mismo id con alan que va a servir de canal para comunicarnos y mostrar que hablamos del mismo usuario,
+# por ej usando el id del chabon
 
 print
 result
