@@ -12,6 +12,7 @@ from src.main.constants import mongo_spec as db
 
 app = Flask(__name__)
 
+
 # todo PASAR TODO A INGLES
 class AvailableDrivers(Resource):
     max_distance = 25  # DEBERIA SETEARLA EL PASSENGER
@@ -60,8 +61,8 @@ class AvailableDrivers(Resource):
         cercanos = []
         for x in db.drivers.find({'available': True}):
             if self._calculate_distance(passenger, x) < self.max_distance:
-                r = self._get_data_user(x['id'])
-                cercanos.append(jsonify(driver=r, position={'lat': x['lat'], 'lon': x['lon']}))
+                r = self._get_data_user(x['_id'])
+                cercanos.append({'driver': r['user'], 'position': {'lat': x['lat'], 'lon': x['lon']}})
 
         return cercanos
 
@@ -77,6 +78,7 @@ class AvailableDrivers(Resource):
 
 class AvailableTrips(Resource):
     max_distance = 2  # DEBERIA SETEARLA EL PASSENGER
+
     def get(self, id):
         logging.info("get Available Trips")
         token = request.headers['token']
@@ -86,8 +88,8 @@ class AvailableTrips(Resource):
             driver = db.drivers.find_one({'_id': id})
 
             if driver and driver['lat'] != "" and driver['lon'] != "":
-                    respuesta = self._get_trips(driver)
-                    return make_response(jsonify(trips=respuesta, token=token), 200)
+                respuesta = self._get_trips(driver)
+                return make_response(jsonify(trips=respuesta, token=token), 200)
 
             logging.error('Id inexistente/no conectado')
             abort(404)
@@ -127,7 +129,7 @@ class AvailableTrips(Resource):
             if self._is_valid_passenger(passenger) and self._esta_cerca(passenger, driver):
                 r = self._get_data_user(passenger['_id'])
                 # x['directions'] porque solo le mando la direccion de google
-                cercanos.append(jsonify(passenger=r, trip=x['directions'], id=x['_id']))
+                cercanos.append({'passenger': r['user'], 'trip': x['directions'], 'id': x['_id']})
         return cercanos
 
     def _get_data_user(self, id):
@@ -161,13 +163,12 @@ class TripHistory(Resource):
         else:
             user = db.drivers.find_one({'_id': id})
 
-
-        #if user:
+        # if user:
         respuesta = self._get_trips(id)
         return make_response(jsonify(trips=respuesta, token=token), 200)
-        #else:
-        #logging.error('Id inexistente/no conectado')
-        #abort(404)
+        # else:
+        # logging.error('Id inexistente/no conectado')
+        # abort(404)
 
     def _get_trips(self, id, type):
         logging.info("Obtener el historial de viajes del usuario")

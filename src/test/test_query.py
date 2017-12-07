@@ -9,20 +9,20 @@ from src.main.query import AvailableDrivers, AvailableTrips
 app = Flask(__name__)
 app.config['TESTING'] = True
 
-drivers = [{'id': 1, 'lat': 10, 'lon': 14, 'available': True},
-           {'id': 4, 'lat': 10, 'lon': 14.2, 'available': True},
-           {'id': 5, 'lat': 10, 'lon': 5, 'available': True},
-           {'id': 10, 'lat': 22, 'lon': 10, 'available': True}]
+drivers = [{'_id': 1, 'lat': 10, 'lon': 14, 'available': True},
+           {'_id': 4, 'lat': 10, 'lon': 14.2, 'available': True},
+           {'_id': 5, 'lat': 10, 'lon': 5, 'available': True},
+           {'_id': 10, 'lat': 22, 'lon': 10, 'available': True}]
 
-passenger = {'id': 2, 'lat': 10, 'lon': 14}
+passenger = {'_id': 2, 'lat': 10, 'lon': 14}
 
-driver = {'id': 1, 'lat': 0, 'lon': 0}
+driver = {'_id': 1, 'lat': 0, 'lon': 0}
 
 trips = [
-    {'id': 1, 'passenger': 45, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 3, 'lon': 5}, 'directions': {}},
-    {'id': 2, 'passenger': 4, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 1, 'lon': 2}, 'directions': {}},
-    {'id': 3, 'passenger': 15, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 0, 'lon': 6}, 'directions': {}},
-    {'id': 4, 'passenger': 2, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 0, 'lon': 10}, 'directions': {}}]
+    {'_id': 1, 'passenger': 45, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 3, 'lon': 5}, 'directions': {}},
+    {'_id': 2, 'passenger': 4, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 1, 'lon': 2}, 'directions': {}},
+    {'_id': 3, 'passenger': 15, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 0, 'lon': 6}, 'directions': {}},
+    {'_id': 4, 'passenger': 2, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 0, 'lon': 10}, 'directions': {}}]
 
 
 
@@ -123,7 +123,7 @@ class TestAvailableDrivers(unittest.TestCase):
             mock_abort.assert_called_with(401)
 
     @patch('src.main.query.jsonify', side_effect=mocked_make_response)
-    @patch('src.main.query.AvailableDrivers._get_data_user', return_value={'dataUser': 'data'})
+    @patch('src.main.query.AvailableDrivers._get_data_user', return_value={'user': 'data'})
     @patch('src.main.constants.mongo_spec.drivers')
     def test_get_drivers_cercanos(self, mock_mongoD, mock_dataUser, mock_jsonify):
         with app.app_context():
