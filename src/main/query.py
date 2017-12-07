@@ -67,7 +67,7 @@ class AvailableDrivers(Resource):
 
     def _get_data_user(self, _id):
         try:
-            r = requests.get(ss.URL + '/users/' + str(id), headers={'token': "superservecito-token"})
+            r = requests.get(ss.URL + '/users/' + str(id), headers={'token': "superservercito-token"})
             r.raise_for_status()
         except requests.exceptions.HTTPError:
             logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
@@ -85,16 +85,9 @@ class AvailableTrips(Resource):
             logging.info("token correcto")
             driver = db.drivers.find_one({'_id': id})
 
-            if driver:
-                if driver['lat'] != "" and driver['lon'] != "":
+            if driver and driver['lat'] != "" and driver['lon'] != "":
                     respuesta = self._get_trips(driver)
-                    # repuesta = self._get_drivers_cercanos(driver)
-                    # respuesta['token'] = token
                     return make_response(jsonify(trips=respuesta, token=token), 200)
-                else:
-                    logging.error('sin ubicacion')
-                    # TODO ver que error corresponde aca y el de arriba
-                    abort(400)
 
             logging.error('Id inexistente/no conectado')
             abort(404)
@@ -140,7 +133,7 @@ class AvailableTrips(Resource):
     def _get_data_user(self, id):
         logging.info("pedir informacion del pasajero a shared")
         try:
-            r = requests.get(ss.URL + '/users/' + str(id), headers={'token': "superservecito-token"})
+            r = requests.get(ss.URL + '/users/' + str(id), headers={'token': "superservercito-token"})
             r.raise_for_status()
         except requests.exceptions.HTTPError:
             logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
