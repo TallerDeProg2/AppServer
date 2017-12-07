@@ -72,7 +72,7 @@ class AvailableDrivers(Resource):
         except requests.exceptions.HTTPError:
             logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
             abort(r.status_code)
-        return r
+        return r.json()
 
 
 class AvailableTrips(Resource):
@@ -139,7 +139,7 @@ class AvailableTrips(Resource):
             logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
             abort(r.status_code)
         # r["id"] = r.pop("_id")
-        return r
+        return r.json()
 
     def _is_valid_passenger(self, passenger):
         return passenger and passenger['lat'] != "" and passenger['lon'] != ""
