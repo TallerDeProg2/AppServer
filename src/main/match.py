@@ -175,7 +175,7 @@ class TripEnd(Resource):
         trip = db.trips.find_one({'_id': id})
 
         if paymethod == 'cash':
-            properties = {}
+            properties = {'method': 'cash'}
         elif paymethod == 'card':
             properties = self.get_card(trip['passenger'])
         else:
@@ -232,7 +232,7 @@ class TripEnd(Resource):
     def post_transaction(self, trip):
         payment_json = {'trip': trip['_id'],
                         'payment': {'value': trip['cost']['value'],
-                                    'transaction_id': '',
+                                    'transaction_id': 'fhwufhwohji7',
                                     'currency': trip['cost']['currency'],
                                     'paymethod': trip['paymethod']['parameters']
                                     }
