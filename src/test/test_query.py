@@ -71,7 +71,7 @@ def mocked_abort(code_error):
 
 class TestAvailableDrivers(unittest.TestCase):
     @patch('src.main.query.jsonify', side_effect=mocked_make_response)
-    @patch('src.main.query.AvailableDrivers._get_drivers_cercanos', return_value=drivers)
+    @patch('src.main.query.AvailableDrivers._get_closer_drivers', return_value=drivers)
     @patch('src.main.query.make_response', side_effect=mocked_make_response)
     @patch('src.main.constants.mongo_spec.drivers')
     @patch('src.main.constants.mongo_spec.passengers')
@@ -131,9 +131,9 @@ class TestAvailableDrivers(unittest.TestCase):
 
             mock_mongoD.find.return_value = drivers
 
-            cercanos = service._get_drivers_cercanos(passenger)
+            cercanos = service._get_closer_drivers(passenger)
 
-            self.assertEqual(cercanos.__len__(), 2)
+            self.assertEqual(cercanos.__len__(), 1)
 
     # @patch('src.main.query.requests.get', side_effect=mocked_requests_get)
     # def test_get_data_user_ok(self, mock_request):
