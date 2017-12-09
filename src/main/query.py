@@ -211,24 +211,23 @@ class TripHistory(Resource):
     def get(self, id, user_type):
         logging.info("get Trip History")
 
-        # token = request.headers['token']
-        # if not gm.validate_token(token, id):
-        #     logging.error('Token inválido')
-        #     abort(401)
-        token = 2
+        token = request.headers['token']
+        if not gm.validate_token(token, id):
+            logging.error('Token inválido')
+            abort(401)
 
-        logging.info("token correcto")
+        logging.info("Token correcto")
         if user_type == 'passenger':
             user = db.passengers.find_one({'_id': id})
         else:
             user = db.drivers.find_one({'_id': id})
 
-        #if user:
-        respuesta = self._get_trips(id, user_type)
+        if user:
+            respuesta = self._get_trips(id, user_type)
+        else:
+            logging.error('Id inexistente/no conectado')
+            abort(404)
         return make_response(jsonify(trips=respuesta, token=token), 200)
-        # else:
-        # logging.error('Id inexistente/no conectado')
-        # abort(404)
 
     def _get_trips(self, id, type):
         logging.info("Obtener el historial de viajes del usuario")
