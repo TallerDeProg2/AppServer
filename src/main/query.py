@@ -155,11 +155,11 @@ class TripHistory(Resource):
     def get(self, id, user_type):
         logging.info("get Trip History")
 
-        token = request.headers['token']
-        if not gm.validate_token(token, id):
-            logging.error('Token inválido')
-            abort(401)
-        # token = 2
+        # token = request.headers['token']
+        # if not gm.validate_token(token, id):
+        #     logging.error('Token inválido')
+        #     abort(401)
+        token = 2
 
         logging.info("token correcto")
         if user_type == 'passenger':
@@ -169,7 +169,7 @@ class TripHistory(Resource):
 
 
         #if user:
-        respuesta = self._get_trips(id)
+        respuesta = self._get_trips(id, user_type)
         return make_response(jsonify(trips=respuesta, token=token), 200)
         #else:
         #logging.error('Id inexistente/no conectado')
