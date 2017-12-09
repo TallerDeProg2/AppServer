@@ -39,8 +39,7 @@ class TripRequest(Resource):
                 if self._is_valid_body_request(content):
                     trip = self._convert_to_trip(id, content)
                     if self._add_trip_to_db(trip):
-                            content['token'] = token
-                            return make_response(jsonify(content), 201)
+                            return make_response(jsonify(trip_id=trip['_id']), 201)
                     else:
                         logging.error("no se puedo completar la operacion")
                         abort(409)
@@ -107,7 +106,7 @@ class TripConfirmation(Resource):
 
         """
         token = request.headers['token']
-        if not gm.validate_token(token, id):
+        if not gm.validate_token(token):
             logging.error('Token inválido')
             abort(401)
 
@@ -118,7 +117,7 @@ class TripConfirmation(Resource):
         #     logging.error('Argumentos ingresados inválidos')
         #     abort(400)
 
-        db.trips.update_one({'_id': content['trip']['id']}, {
+        db.trips.update_one({'_id': content['trip_id']}, {
             '$set': {
                 'driver': id,
                 'status': 'inProgress'
@@ -140,7 +139,7 @@ class TripStart(Resource):
 
          """
         token = request.headers['token']
-        if not gm.validate_token(token, id):
+        if not gm.validate_token(token):
             logging.error('Token inválido')
             abort(401)
 
@@ -167,7 +166,7 @@ class TripEnd(Resource):
 
          """
         token = request.headers['token']
-        if not gm.validate_token(token, id):
+        if not gm.validate_token(token):
             logging.error('Token inválido')
             abort(401)
 
@@ -176,7 +175,7 @@ class TripEnd(Resource):
         trip = db.trips.find_one({'_id': id})
 
         if paymethod == 'cash':
-            properties = {}
+            properties = {'method': 'cash'}
         elif paymethod == 'card':
             properties = self.get_card(trip['passenger'])
         else:
@@ -227,21 +226,13 @@ class TripEnd(Resource):
                           'parameters': properties}
         trip['paymethod'] = paymethod_json
 
-        try:
-            r = requests.post(ss.URL + '/trips', json=trip, headers={'token': 'superservercito-token'})
-            r.raise_for_status()
-        except requests.exceptions.HTTPError:
-            if r.status_code != 503:
-                logging.error('Conexión con el Shared dio error en /trips: ' + repr(r.status_code))
-                abort(r.status_code)
-            else:
-                while not ok:
-                    ok = self.post_transaction(trip)
+        while not ok:
+            ok = self.post_transaction(trip)
 
     def post_transaction(self, trip):
         payment_json = {'trip': trip['_id'],
                         'payment': {'value': trip['cost']['value'],
-                                    'transaction_id': '',
+                                    'transaction_id': 'fhwufhwohji7',
                                     'currency': trip['cost']['currency'],
                                     'paymethod': trip['paymethod']['parameters']
                                     }
