@@ -79,36 +79,50 @@ class AvailableTrips(Resource):
     max_distance = 2  # DEBERIA SETEARLA EL PASSENGER
 
     def get(self, id):
-        logging.info("get Available Trips")
+        """
+        Viajes disponibles mas cercanos para un driver
+        :param id:
+        :return lista de viajes con la informacion del pasajero:
+        """
+        logging.info("[GET] Available Trips.")
         token = request.headers['token']
 
         if gm.validate_token(token):
-            logging.info("token correcto")
-            driver = db.drivers.find_one({'_id': id})
+            logging.info("[GET] El token es correcto")
 
-            if driver and driver['lat'] != "" and driver['lon'] != "":
+            # puede ingresar opcionalmente por parametro el radio de busqueda de los viajes en km
+            # sino por default son 2 km
+            # distance = request.args['max_distance']
+            # if distance: self.max_distance = distance
+
+            try:
+                driver = db.drivers.find_one({'_id': id})
+            except db.errors.ConnectionFailure:
+                logging.error('[GET] Fallo de conexion con la base de datos')
+                abort(500)
+
+            if self._is_valid_user(driver):
                 respuesta = self._get_trips(driver)
                 return make_response(jsonify(trips=respuesta, token=token), 200)
 
-            logging.error('Id inexistente/no conectado')
+            logging.error('[GET] Usuario no conectado')
             abort(404)
 
         else:
-            logging.error('Token invalido')
+            logging.error('[GET] Token invalido')
             abort(401)
 
     def _calculate_distance(self, passenger, driver):
         """
-            Calculate the great circle distance between two points
-            on the earth (specified in decimal degrees)
+        Calcula la distancia entre un driver y un passenger
+        :param passenger:
+        :param driver:
+        :return km de separcion entre el chofer y el pasajero:
         """
-        logging.info("Calcula distancia entre pasajero y conductor")
-        # convert decimal degrees to radians
         londriver, latdriver = driver['lon'], driver['lat']
         lonpassenger, latpassenger = passenger['lon'], passenger['lat']
         lon_p, lat_p, lon_d, lat_d = map(radians,
                                          [float(lonpassenger), float(latpassenger), float(londriver), float(latdriver)])
-
         lon_distance = lon_d - lon_p
         lat_distance = lat_d - lat_p
         a = sin(lat_distance / 2) ** 2 + cos(lat_p) * cos(lat_d) * sin(lon_distance / 2) ** 2
@@ -116,34 +130,45 @@ class AvailableTrips(Resource):
         km = 6367 * c
         return km
 
-    def _esta_cerca(self, passenger, driver):
-        logging.info("filtra si estan cerca")
+    def _is_closer(self, passenger, driver):
         return self._calculate_distance(passenger, driver) < self.max_distance
 
     def _get_trips(self, driver):
-        logging.info("obtener los viajes disponibles y choferes mas cercanos")
-        cercanos = []
+        logging.info("[_get_trips] Busca los viajes cercanos.")
+        nearest = []
         for x in db.trips.find({'status': 'available'}):
             passenger = db.passengers.find_one({'_id': x['passenger']})
-            if self._is_valid_passenger(passenger) and self._esta_cerca(passenger, driver):
+            if self._is_valid_user(passenger) and self._is_closer(passenger, driver):
                 r = self._get_data_user(passenger['_id'])
-                # x['directions'] porque solo le mando la direccion de google
-                cercanos.append({'passenger': r['user'], 'trip': x['directions'], 'id': x['_id']})
-        return cercanos
+                # x['directions'] porque solo le mando la direccion de google'passenger': r['user']
+                nearest.append({'id': x['_id'], 'trip': x['directions'], 'passenger': r['user']})
+        logging.info("[_get_trips] Se encontraron ", nearest.count(nearest), " viajes cercanos.")
+        return nearest
 
     def _get_data_user(self, id):
-        logging.info("pedir informacion del pasajero a shared")
+        """
+        Obtiene del Shared server los datos del usuario,
+        si hay un error se aborta con el mismo status-code
+        :param id:
+        :return json con los datos del usuario:
+        """
+        logging.info("[_get_data_user] Pide la informacion del usuario al Shared server")
         try:
-            r = requests.get(ss.URL + '/users/' + str(id), headers={'token': "superservercito-token"})
-            r.raise_for_status()
+            response = requests.get(ss.URL + '/users/' + str(id), headers={'token': "superservercito-token"})
+            response.raise_for_status()
         except requests.exceptions.HTTPError:
-            logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
-            abort(r.status_code)
-        # r["id"] = r.pop("_id")
-        return r.json()
+            logging.error('[_get_data_user] Conexión con el Shared dio error: ' + repr(response.status_code))
+            abort(response.status_code)
+        logging.info("[_get_data_user] La consulta al Shared fue correcta.")
+        return response.json()
 
-    def _is_valid_passenger(self, passenger):
-        return passenger and passenger['lat'] != "" and passenger['lon'] != ""
+    def _is_valid_user(self, user):
+        """
+        El usuario es valido cuando no es None y su latitud y longitud no estan vacias
+        :param user:
+        :return bool:
+        """
+        return user and user['lat'] != "" and user['lon'] != ""
 
 
 class TripHistory(Resource):
