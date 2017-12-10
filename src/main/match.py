@@ -88,7 +88,7 @@ class TripRequest(Resource):
         trip["totalTime"] = 0
         trip["waitTime"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         trip["travelTime"] = 0
-        trip["distance"] = 0
+        trip["distance"] = content['trip']['legs'][0]['distance']['value']
         trip["startTime"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         trip["status"] = "available"
         trip["cost"] = {}
