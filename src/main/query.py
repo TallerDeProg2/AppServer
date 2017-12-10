@@ -12,6 +12,7 @@ from src.main.constants import mongo_spec as db
 
 app = Flask(__name__)
 
+
 # todo PASAR TODO A INGLES
 class AvailableDrivers(Resource):
     max_distance = 25  # DEBERIA SETEARLA EL PASSENGER
@@ -60,23 +61,24 @@ class AvailableDrivers(Resource):
         cercanos = []
         for x in db.drivers.find({'available': True}):
             if self._calculate_distance(passenger, x) < self.max_distance:
-                r = self._get_data_user(x['id'])
-                cercanos.append(jsonify(driver=r, position={'lat': x['lat'], 'lon': x['lon']}))
+                r = self._get_data_user(x['_id'])
+                cercanos.append({'driver': r['user'], 'position': {'lat': x['lat'], 'lon': x['lon']}})
 
         return cercanos
 
     def _get_data_user(self, _id):
         try:
-            r = requests.get(ss.URL + '/users/' + str(id), headers={'token': "superservecito-token"})
+            r = requests.get(ss.URL + '/users/' + str(id), headers={'token': "superservercito-token"})
             r.raise_for_status()
         except requests.exceptions.HTTPError:
             logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
             abort(r.status_code)
-        return r
+        return r.json()
 
 
 class AvailableTrips(Resource):
     max_distance = 2  # DEBERIA SETEARLA EL PASSENGER
+
     def get(self, id):
         logging.info("get Available Trips")
         token = request.headers['token']
@@ -85,16 +87,9 @@ class AvailableTrips(Resource):
             logging.info("token correcto")
             driver = db.drivers.find_one({'_id': id})
 
-            if driver:
-                if driver['lat'] != "" and driver['lon'] != "":
-                    respuesta = self._get_trips(driver)
-                    # repuesta = self._get_drivers_cercanos(driver)
-                    # respuesta['token'] = token
-                    return make_response(jsonify(trips=respuesta, token=token), 200)
-                else:
-                    logging.error('sin ubicacion')
-                    # TODO ver que error corresponde aca y el de arriba
-                    abort(400)
+            if driver and driver['lat'] != "" and driver['lon'] != "":
+                respuesta = self._get_trips(driver)
+                return make_response(jsonify(trips=respuesta, token=token), 200)
 
             logging.error('Id inexistente/no conectado')
             abort(404)
@@ -134,19 +129,19 @@ class AvailableTrips(Resource):
             if self._is_valid_passenger(passenger) and self._esta_cerca(passenger, driver):
                 r = self._get_data_user(passenger['_id'])
                 # x['directions'] porque solo le mando la direccion de google
-                cercanos.append(jsonify(passenger=r, trip=x['directions'], id=x['_id']))
+                cercanos.append({'passenger': r['user'], 'trip': x['directions'], 'id': x['_id']})
         return cercanos
 
     def _get_data_user(self, id):
         logging.info("pedir informacion del pasajero a shared")
         try:
-            r = requests.get(ss.URL + '/users/' + str(id), headers={'token': "superservecito-token"})
+            r = requests.get(ss.URL + '/users/' + str(id), headers={'token': "superservercito-token"})
             r.raise_for_status()
         except requests.exceptions.HTTPError:
             logging.error('Conexión con el Shared dio error: ' + repr(r.status_code))
             abort(r.status_code)
         # r["id"] = r.pop("_id")
-        return r
+        return r.json()
 
     def _is_valid_passenger(self, passenger):
         return passenger and passenger['lat'] != "" and passenger['lon'] != ""
@@ -168,13 +163,12 @@ class TripHistory(Resource):
         else:
             user = db.drivers.find_one({'_id': id})
 
-
-        #if user:
+        # if user:
         respuesta = self._get_trips(id)
         return make_response(jsonify(trips=respuesta, token=token), 200)
-        #else:
-        #logging.error('Id inexistente/no conectado')
-        #abort(404)
+        # else:
+        # logging.error('Id inexistente/no conectado')
+        # abort(404)
 
     def _get_trips(self, id, type):
         logging.info("Obtener el historial de viajes del usuario")

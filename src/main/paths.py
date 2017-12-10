@@ -13,7 +13,8 @@ app.config["token"] = "servercito-token"
 
 logging.basicConfig(format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     filename='ubreLogs.log',
-                    filemode='w')
+                    filemode='w',
+                    level=logging.DEBUG)
 
 errors = {
     'BadRequest': {
@@ -35,6 +36,10 @@ errors = {
     'Conflict': {
         'message': "Solicitud no pudo ser procesada por conflicto de recursos",
         'status': 409
+    },
+    'Forbidden': {
+        'message': "El token del servidor no esta autorizado",
+        'status': 403
     }
 }
 # TODO generalizar los endpoints con plural o singular
