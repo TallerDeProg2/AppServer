@@ -80,6 +80,8 @@ class AvailableDrivers(Resource):
         for driver in db.drivers.find({'available': True}):
             if self._calculate_distance(passenger, driver) < self.max_distance:
                 user_data = self._get_data_user(driver['_id'])
+                user_data['user'].pop('cars')
+                user_data['user'].pop('_ref')
                 nearest.append({'driver': user_data['user'], 'position': {'lat': driver['lat'], 'lon': driver['lon']}})
         logging.info("[_get_closer_drivers] Se encontraron "+str(len(nearest))+ " choferes cercanos.")
         return nearest
@@ -99,8 +101,6 @@ class AvailableDrivers(Resource):
             logging.error('[_get_data_user] Conexión con el Shared dio error: ' + repr(response.status_code))
             abort(response.status_code)
         logging.info("[_get_data_user] La consulta al Shared fue correcta.")
-        response.pop('cars')
-        response.pop('_ref')
         return response.json()
 
     def _is_valid_user(self, user):
