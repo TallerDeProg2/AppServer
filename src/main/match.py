@@ -207,7 +207,7 @@ class TripEnd(Resource):
         self.post_trip(trip, cost, trip_time, paymethod, properties)
         self.update_db(trip)
 
-        return Response(status=201)
+        return make_response(jsonify(cost=cost), 201)
 
     def get_card(self, id_passenger):
         try:
