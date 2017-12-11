@@ -22,11 +22,11 @@ class AvailableDrivers(Resource):
         :param id:
         :return lista con la informacion de los choferes:
         """
-        logging.info("[GET:/passengers/"+ id+ "/drivers] Available Drivers.")
+        logging.info("[GET:/passengers/"+ str(id)+ "/drivers] Available Drivers.")
         token = request.headers['token']
 
         if gm.validate_token(token):
-            logging.info("[GET:/passengers/"+ id+ "/drivers] El token es correcto")
+            logging.info("[GET:/passengers/"+ str(id)+ "/drivers] El token es correcto")
 
             # puede ingresar opcionalmente por parametro el radio de busqueda de los viajes en km
             # sino por default son 2 km
@@ -35,20 +35,20 @@ class AvailableDrivers(Resource):
             try:
                 passenger = db.passengers.find_one({'_id': id})
             except db.errors.ConnectionFailure:
-                logging.error('[GET:/passengers/'+ id+ '/drivers] Fallo de conexion con la base de datos')
+                logging.error('[GET:/passengers/'+ str(id)+ '/drivers] Fallo de conexion con la base de datos')
                 abort(500)
 
             if self._is_valid_user(passenger):
                 response = {}
                 response['drivers'] = self._get_closer_drivers(passenger)
                 response['token'] = token
-                logging.info('[GET:/passengers/'+ id+ '/drivers] Todo salio correcto')
+                logging.info('[GET:/passengers/'+ str(id)+ '/drivers] Todo salio correcto')
                 return make_response(jsonify(response), 200)
 
-            logging.error('[GET:/passengers/'+ id+ '/drivers] Usuario no conectado')
+            logging.error('[GET:/passengers/'+ str(id)+ '/drivers] Usuario no conectado')
             abort(404)
 
-        logging.error('[GET:/passengers/'+ id+ '/drivers] Token invalido')
+        logging.error('[GET:/passengers/'+ str(id)+ '/drivers] Token invalido')
         abort(401)
 
     def _calculate_distance(self, passenger, driver):
@@ -119,11 +119,11 @@ class AvailableTrips(Resource):
         :param id:
         :return lista de viajes con la informacion del pasajero:
         """
-        logging.info("[GET:/drivers/"+id+"/trips] Available Trips.")
+        logging.info("[GET:/drivers/"+str(id)+"/trips] Available Trips.")
         token = request.headers['token']
 
         if gm.validate_token(token):
-            logging.info("[GET:/drivers/"+id+"/trips] El token es correcto")
+            logging.info("[GET:/drivers/"+str(id)+"/trips] El token es correcto")
 
             # puede ingresar opcionalmente por parametro el radio de busqueda de los viajes en km
             # sino por default son 2 km
@@ -133,19 +133,19 @@ class AvailableTrips(Resource):
             try:
                 driver = db.drivers.find_one({'_id': id})
             except db.errors.ConnectionFailure:
-                logging.error('[GET:/drivers/'+id+'/trips] Fallo de conexion con la base de datos')
+                logging.error('[GET:/drivers/'+str(id)+'/trips] Fallo de conexion con la base de datos')
                 abort(500)
 
             if self._is_valid_user(driver):
                 respuesta = self._get_trips(driver)
-                logging.info('[GET:/drivers/'+id+ '/trips] Todo salio correcto')
+                logging.info('[GET:/drivers/'+str(id)+ '/trips] Todo salio correcto')
                 return make_response(jsonify(trips=respuesta, token=token), 200)
 
-            logging.error('[GET:/drivers/'+id+'/trips] Usuario no conectado')
+            logging.error('[GET:/drivers/'+str(id)+'/trips] Usuario no conectado')
             abort(404)
 
         else:
-            logging.error('[GET:/drivers/'+id+'/trips] Token invalido')
+            logging.error('[GET:/drivers/'+str(id)+'/trips] Token invalido')
             abort(401)
 
     def _calculate_distance(self, passenger, driver):
