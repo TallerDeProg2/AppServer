@@ -80,6 +80,8 @@ class AvailableDrivers(Resource):
         for driver in db.drivers.find({'available': True}):
             if self._calculate_distance(passenger, driver) < self.max_distance:
                 user_data = self._get_data_user(driver['_id'])
+                user_data['user'].pop('cars')
+                user_data['user'].pop('_ref')
                 nearest.append({'driver': user_data['user'], 'position': {'lat': driver['lat'], 'lon': driver['lon']}})
         logging.info("[_get_closer_drivers] Se encontraron "+str(len(nearest))+ " choferes cercanos.")
         return nearest
