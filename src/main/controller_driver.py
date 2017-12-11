@@ -23,5 +23,5 @@ class Driver(Resource):
 
     def put(self, id):
         service = edit.Edit()
-        r = service.put(id, ss.URL + '/users/' + repr(id), sch.user_full_schema)
+        r = service.put(id, ss.URL + '/users/' + repr(id), sch.user_full_schema, 'user')
         return gm.build_response(r)
