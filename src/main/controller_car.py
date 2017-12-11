@@ -19,12 +19,12 @@ class Car(Resource):
             abort(401)
         service = gets.Get()
         car = service.get(ss.URL + '/users/' + repr(id) + '/cars')['car']
-        car.pop('_ref') #TODO: Ver si ana SIEMPRE devuelve con ref
+        car.pop('_ref')
         return car
 
     def put(self, id):
         service = edit.Edit()
-        car = service.put(id, ss.URL + '/users/' + repr(id) + '/cars', sch.car_schema)['car']
+        car = service.put(id, ss.URL + '/users/' + repr(id) + '/cars', sch.car_schema, 'car')['car']
         car.pop('_ref')
         return car
 
