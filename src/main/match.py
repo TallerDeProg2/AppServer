@@ -24,53 +24,70 @@ class TripRequest(Resource):
         return "get Trip request"
 
     def post(self, id):
-        """Registar una solicitud de viaje"""
-        logging.info("post Trip request")
+        """
+        Crear una soliciud e viaje.
+        :param id:
+        :return json con id del viaje solicitado:
+        """
+        logging.info("[POST:/passengers/" + str(id) + "/trips/request] Trip Request.")
         token = request.headers['token']
 
         if gm.validate_token(token):
-            logging.info("token correcto")
+            logging.info("[POST:/passengers/" + str(id) + "/trips/request] El token es correcto")
             passenger = db.passengers.find_one({'_id': id})
 
             if passenger:
                 logging.info("usuario correcto")
                 content = request.get_json()
 
-                if self._is_valid_body_request(content):
-                    trip = self._convert_to_trip(id, content)
-                    if self._add_trip_to_db(trip):
-                            return make_response(jsonify(trip_id=trip['_id']), 201)
-                    else:
-                        logging.error("no se puedo completar la operacion")
-                        abort(409)
-                else:
-                    logging.error('Argumentos ingresados inválidos')
+                try:
+                    js.validate(content, self.schema)
+                except js.exceptions.ValidationError:
+                    logging.error('[POST:/passengers/' + str(id) + '/trips/request] Argumentos ingresados inválidos')
                     abort(400)
+
+                # if self.is_passenger_alredy_has_some_trip_request():
+
+
+                trip = self._convert_to_trip(id, content)
+                self._add_trip_to_db(trip)
+
+                logging.info('[POST:/passengers/' + str(id) + '/trips/request] Todo salio correcto')
+                return make_response(jsonify(trip_id=trip['_id']), 201)
+
             else:
-                logging.error('Id inexistente/no conectado')
+                logging.error('[POST:/passengers/' + str(id) + '/trips/request] Usuario no conectado')
                 abort(404)
         else:
-            logging.error('Token invalido')
+            logging.error('[POST:/passengers/' + str(id) + '/trips/request] Token invalido')
             abort(401)
 
-    def _is_valid_body_request(self, body):
-
-        try:
-            js.validate(body, self.schema)
-        except js.exceptions.ValidationError:
-            return False
-        return True
-
     def _add_trip_to_db(self, trip):
+        """
+        Agrega el viaje en la base de datos,
+        si la clave esta duplicada aborta con codigo de error 409
+        :param trip:
+        :return:
+        """
+        any_trip = db.trips.find({'passenger': trip['passenger'], 'status': 'available'})
+        if any_trip:
+            logging.error("[POST:/passengers/" + str(trip['passenger']) + "/trips/request] Ya posee una solicitud de viaje activa")
+            abort(409) #TODO: ver que error tirar
         trip["_id"] = db.trips.count() + 1
         try:
             db.trips.insert_one(trip)
             # content["id"] = content.pop("_id")
         except db.errors.DuplicateKeyError:
-            return False
-        return True
+            logging.error("[POST:/passengers/" + str(trip['passenger']) + "/trips/request] No se puedo completar la operacion")
+            abort(409)
+
 
     def _convert_to_trip(self, id_passenger, content):
+        """
+        :param id_passenger:
+        :param content:
+        :return:
+        """
         trip = {}
         trip["passenger"] = id_passenger
         trip["driver"] = ""
