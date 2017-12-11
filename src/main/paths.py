@@ -13,7 +13,8 @@ app.config["token"] = "servercito-token"
 
 logging.basicConfig(format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     filename='ubreLogs.log',
-                    filemode='w')
+                    filemode='w',
+                    level=logging.DEBUG)
 
 errors = {
     'BadRequest': {
@@ -35,6 +36,10 @@ errors = {
     'Conflict': {
         'message': "Solicitud no pudo ser procesada por conflicto de recursos",
         'status': 409
+    },
+    'Forbidden': {
+        'message': "El token del servidor no esta autorizado",
+        'status': 403
     }
 }
 # TODO generalizar los endpoints con plural o singular
@@ -58,7 +63,8 @@ api.add_resource(directions.GetDirections, '/passengers/<int:id>/directions')
 
 api.add_resource(query.AvailableDrivers, '/passengers/<int:id>/drivers')
 api.add_resource(query.AvailableTrips, '/drivers/<int:id>/trips')
-api.add_resource(query.TripHistory, '/passengers/<int:id>/trips/history')
+api.add_resource(query.PassengerTripHistory, '/passengers/<int:id>/trips/history')
+api.add_resource(query.DriverTripHistory, '/drivers/<int:id>/trips/history')
 
 api.add_resource(match.TripRequest, '/passengers/<int:id>/trips/request')
 api.add_resource(match.TripEstimate, '/trips/estimate')
