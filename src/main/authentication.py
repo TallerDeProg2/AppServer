@@ -75,7 +75,6 @@ class SignUpUser(Resource):
             abort(400)
 
         logging.info('Usuario id: ' + repr(r['user']['id']) + ' creado en base ' + content['type'])
-        #TODO: No esta loggeando
-
+        
         return gm.build_response(r), 201
 
