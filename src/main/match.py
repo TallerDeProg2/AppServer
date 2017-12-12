@@ -13,6 +13,7 @@ from src.main import global_method as gm
 from src.main.constants import mongo_spec as db
 import requests
 import src.main.constants.shared_server as ss
+from pyfcm import FCMNotification
 
 app = Flask(__name__)
 
@@ -145,9 +146,30 @@ class TripConfirmation(Resource):
                 'available': False
             }
         })
+        pass_id = db.trips.find_one({'_id': content['trip_id']})['passenger']
+        self.push_notif(pass_id)
 
         return Response(status=201)
 
+    def push_notif(self, id):
+        try:
+            r = requests.get(ss.URL + '/users/' + str(id), headers={'token': 'superservercito-token'})
+            r.raise_for_status()
+        except requests.exceptions.HTTPError:
+            logging.error('Conexión con el Shared dio error en post: ' + repr(r.status_code))
+            abort(r.status_code)
+
+        username = r.json()['user']['username']
+
+        api_keys = 'AAAAaxCakgY:APA91bG4JlqQn6YhGAoPck1_moeHW4PxUWiPxnjEmxqfbVLTCVk7Wfn6fOq7AR7b_zPBF0oR9ln-d1maLH5ZoqbFea0eEl0O10RHUYyljyztqkwJEq46kZwVgKgt377PwVH00pjR87i4'
+
+        push_service = FCMNotification(api_key=api_keys)
+        message_title = "Viaje confirmado"
+        message_body = "Su viaje está en camino"
+        result = push_service.notify_topic_subscribers(topic_name=username, message_title=message_title,
+                                                   message_body=message_body)
+        print(result)
+        
 
 class TripStart(Resource):
     def post(self, id):
