@@ -1,6 +1,6 @@
 import logging
 import requests
-from flask import Flask, request
+from flask import Flask, request, Response
 from flask_restful import Resource, abort
 import src.main.constants.mongo_spec as db
 import src.main.global_method as gm
@@ -79,3 +79,34 @@ class SignUpUser(Resource):
 
         return gm.build_response(r), 201
 
+
+class LogOut(Resource):
+    schema = sch.user_reduced_schema
+
+    def post(self,id):
+        """
+        Permite que el usuario cierre sesion
+        :param id:
+        :return:
+        """
+        logging.info("[POST:/users/" + str(id) + "/logout] LogOut.")
+        token = request.headers['token']
+
+        if gm.validate_token(token, id):
+            logging.info("[POST:/passengers/" + str(id) + "/drivers] El token es correcto")
+
+            try:
+                db.drivers.update_one({'_id': id}, {
+                    '$set': {
+                        'available': False
+                    }
+                })
+            except db.errors.ConnectionFailure:
+                logging.error('[POST:/users/' + str(id) + '/logout] Fallo de conexion con la base de datos')
+                abort(500)
+
+
+            return Response(status=201)
+
+        logging.error('[POST:/users/' + str(id) + '/logout] Token invalido')
+        abort(401)
