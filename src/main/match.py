@@ -70,7 +70,7 @@ class TripRequest(Resource):
         :param trip:
         :return:
         """
-        any_trip = db.trips.find({'passenger': trip['passenger'], 'status': 'available'})
+        any_trip = db.trips.find_one({'passenger': trip['passenger'], 'status': 'available'})
         if any_trip:
             logging.error("[POST:/passengers/" + str(trip['passenger']) + "/trips/request] Ya posee una solicitud de viaje activa")
             abort(409) #TODO: ver que error tirar
@@ -230,6 +230,7 @@ class TripEnd(Resource):
         self.update_db(trip)
 
         return cost, 201
+
 
     def get_card(self, id_passenger):
         try:
