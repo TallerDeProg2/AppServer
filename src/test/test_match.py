@@ -5,12 +5,13 @@ import requests
 import json
 
 
+@patch('src.main.global_method.push_notif')
 @patch('src.main.constants.mongo_spec.drivers')
 @patch('src.main.constants.mongo_spec.trips')
 @patch('src.main.global_method.validate_token')
 @patch('src.main.match.requests.get')
 @patch('src.main.match.requests.post')
-def test_ending_trip_when_response_is_ok(mock_post, mock_get, mock_validate_token, mock_trips, mock_drivers):
+def test_ending_trip_when_response_is_ok(mock_post, mock_get, mock_validate_token, mock_trips, mock_drivers, mock_push):
     args = {
             'paymethod': 'card'
         }
@@ -64,8 +65,11 @@ def test_ending_trip_when_response_is_ok(mock_post, mock_get, mock_validate_toke
     }
 
     expected_response = {
+        'cost':
+            {
             'currency': 'ARS',
             'value': 3043890
+            }
     }
 
     header = {'token': '838298'}

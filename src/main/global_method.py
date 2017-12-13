@@ -5,6 +5,7 @@ from flask import request
 import jsonschema as js
 import logging
 from flask_restful import abort
+from pyfcm import FCMNotification
 
 
 def encode_token(user_id):
@@ -74,4 +75,12 @@ def build_response(r): #TODO: Meterle el fb o pedirle a ana q lo mande
     response.pop('cars')
 
     return response
+
+
+def push_notif(id, message_title, message_body):
+    api_keys = 'AAAAaxCakgY:APA91bG4JlqQn6YhGAoPck1_moeHW4PxUWiPxnjEmxqfbVLTCVk7Wfn6fOq7AR7b_zPBF0oR9ln-d1maLH5ZoqbFea0eEl0O10RHUYyljyztqkwJEq46kZwVgKgt377PwVH00pjR87i4'
+
+    push_service = FCMNotification(api_key=api_keys)
+    push_service.notify_topic_subscribers(topic_name=str(id), message_title=message_title,
+                                          message_body=message_body)
 

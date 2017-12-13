@@ -69,7 +69,7 @@ class TripRequest(Resource):
         :param trip:
         :return:
         """
-        any_trip = db.trips.find({'passenger': trip['passenger'], 'status': 'available'})
+        any_trip = db.trips.find_one({'passenger': trip['passenger'], 'status': 'available'})
         if any_trip:
             logging.error("[POST:/passengers/" + str(trip['passenger']) + "/trips/request] Ya posee una solicitud de viaje activa")
             abort(409) #TODO: ver que error tirar
@@ -145,8 +145,20 @@ class TripConfirmation(Resource):
                 'available': False
             }
         })
+        pass_id = db.trips.find_one({'_id': content['trip_id']})['passenger']
+        self.push_notification(id, pass_id)
 
         return Response(status=201)
+
+    def push_notification(self, driver_id, pass_id):
+        try:
+            r = requests.get(ss.URL + '/users/' + str(driver_id), headers={'token': 'superservercito-token'})
+            r.raise_for_status()
+        except requests.exceptions.HTTPError:
+            logging.error('Conexión con el Shared dio error en get: ' + repr(r.status_code))
+            abort(r.status_code)
+        driver_username = r.json()['user']['username']
+        gm.push_notif(pass_id, "Viaje confirmado", "Su viaje está en camino, el conductor es " + driver_username)
 
 
 class TripStart(Resource):
@@ -206,8 +218,10 @@ class TripEnd(Resource):
         cost = self.get_cost(trip['distance'], trip_time, paymethod, start_datetime, trip['startTime'])
         self.post_trip(trip, cost, trip_time, paymethod, properties)
         self.update_db(trip)
+        gm.push_notif(trip['driver'], "Viaje terminado", "Esperamos que haya disfrutado su viaje")
 
-        return cost, 201
+        return {'cost': cost}, 201
+
 
     def get_card(self, id_passenger):
         try:
