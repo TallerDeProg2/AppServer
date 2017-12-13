@@ -105,7 +105,6 @@ class LogOut(Resource):
                 logging.error('[POST:/users/' + str(id) + '/logout] Fallo de conexion con la base de datos')
                 abort(500)
 
-
             return Response(status=201)
 
         logging.error('[POST:/users/' + str(id) + '/logout] Token invalido')
