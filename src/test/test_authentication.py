@@ -69,3 +69,68 @@ class TestAuthentication(unittest.TestCase):
         response_json = json.loads(response.get_data())
 
         assert_list_equal([response_json], output)
+
+    @patch('src.main.constants.mongo_spec.passengers')
+    @patch('src.main.global_method.encode_token')
+    @patch('src.main.authentication.requests.post')
+    def test_signing_user_up_when_response_is_ok(self, mock_post, mock_encode_token, mock_passengers):
+        args = {
+            'type': 'passenger',
+            'username': 'pepe',
+            'password': 'lalala',
+            'fb': {
+                'userId': 'pepefb',
+                'authToken': '1234'
+            },
+            'firstname': 'SOFIA',
+            'lastname': 'argento',
+            'country': 'argentina',
+            'email': 'pepekpo@gmail.com',
+            'birthdate': '27484'
+        }
+
+        user = {
+            'user': {
+                '_ref': 5678,
+                'id': 27478,
+                'username': 'pepe',
+                'password': 'lalala',
+                'cars': {},
+                'fb': {
+                    'userId': 'pepefb',
+                    'authToken': '1234'
+                },
+                'firstname': 'juan',
+                'lastname': 'argento',
+                'country': 'argentina',
+                'email': 'pepekpo@gmail.com',
+                'birthdate': '27484'
+            }
+        }
+
+        expected_response = {
+                'id': 27478,
+                'username': 'pepe',
+                'password': 'lalala',
+                'fb': {
+                    'userId': 'pepefb',
+                    'authToken': '1234'
+                },
+                'firstname': 'juan',
+                'lastname': 'argento',
+                'country': 'argentina',
+                'email': 'pepekpo@gmail.com',
+                'birthdate': '27484'
+            }
+
+        header = {'token': '838298'}
+
+        mock_post.return_value = Mock(ok=True)
+        mock_post.return_value.json.return_value = user
+
+        app2 = app.test_client()
+        response = app2.post('/users', data=json.dumps(args), headers=header,
+                            content_type='application/json')
+        response_json = json.loads(response.get_data())
+
+        assert_list_equal([response_json], [expected_response])

@@ -8,7 +8,7 @@ import json
 @patch('src.main.directions.gmaps')
 @patch('src.main.constants.mongo_spec.passengers')
 @patch('src.main.global_method.validate_token')
-def test_getting_user_when_response_is_ok(mock_validate_token, mock_passengers, mock_directions):
+def test_getting_directions(mock_validate_token, mock_passengers, mock_directions):
     input = {
             'lat': 47.2737,
             'lon': 28.284
