@@ -47,7 +47,6 @@ api = Api(app, errors=errors)
 
 api.add_resource(authentication.LogIn, '/validate')
 api.add_resource(authentication.HelloWorld, '/')
-api.add_resource(authentication.ByeWorld, '/chau')
 api.add_resource(authentication.SignUpUser, '/users')
 api.add_resource(authentication.LogOut, '/users/<int:id>/logout')
 
