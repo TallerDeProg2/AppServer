@@ -4,7 +4,7 @@ import requests
 from flask import Flask
 from mock import patch, MagicMock
 
-from src.main.query import AvailableDrivers, AvailableTrips
+from src.main.query import AvailableDrivers, AvailableTrips, TripHistory
 
 app = Flask(__name__)
 app.config['TESTING'] = True
@@ -23,7 +23,6 @@ trips = [
     {'_id': 2, 'passenger': 4, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 1, 'lon': 2}, 'directions': {}},
     {'_id': 3, 'passenger': 15, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 0, 'lon': 6}, 'directions': {}},
     {'_id': 4, 'passenger': 2, 'origin': {'lat': 0, 'lon': 0}, 'destination': {'lat': 0, 'lon': 10}, 'directions': {}}]
-
 
 
 # This method will be used by the mock to replace requests.get
@@ -59,10 +58,11 @@ def mocked_make_response(*args, **kwargs):
             self.json_data = json_data
             self.status_code = status_code
 
-# <<<<<<< HEAD
-#     return MockResponse(args, 200)
-# =======
-    return MockResponse(kwargs, 200)
+        def make_response(self):
+            return self.json_data, self.status_code
+
+    return MockResponse(args, 200).make_response()
+    # return MockResponse(kwargs, 200)
 
 
 def mocked_abort(code_error):
@@ -81,16 +81,20 @@ class TestAvailableDrivers(unittest.TestCase):
         with app.app_context():
             service = AvailableDrivers()
 
-            mock_request.headers.return_value = {"token": 1}
+            mock_request.headers = {"token": 1}
             mock_gm.validate_token.return_value = True
             mock_mongoP.find_one.return_value = passenger
             mock_mongoD.find.return_value = drivers
             # mock_mr.return_value = mocked_make_response()
 
-            response = service.get("2")
-
+            response = service.get(2)
             # self.assertEqual(response, drivers)
+
+            mock_jsonify.assert_called_once_with({'drivers': drivers, "token": 1})
             mock_mr.assert_called_once()
+            # mock_mr.assert_called_once_with()
+
+            # self.assertEqual(response.json)
 
     @patch('src.main.query.abort')
     @patch('src.main.global_method.validate_token', return_value=False)
@@ -114,16 +118,16 @@ class TestAvailableDrivers(unittest.TestCase):
         with app.app_context():
             service = AvailableDrivers()
 
-            mock_request.headers.return_value = {"token": 1}
+            mock_request.headers = {"token": 1}
             mock_mongo.find_one.return_value = False
             # mock_abort.side_effect = mocked_abort
-            service.get("2")
+            service.get(2)
 
-            # mock_abort.assert_called_with(404)
-            mock_abort.assert_called_with(401)
+            mock_abort.assert_any_call(404)
 
     @patch('src.main.query.jsonify', side_effect=mocked_make_response)
-    @patch('src.main.query.AvailableDrivers._get_data_user', return_value={'user': {'user': 'user', 'cars':{}, '_ref':''}})
+    @patch('src.main.query.AvailableDrivers._get_data_user',
+           return_value={'user': {'user': 'user', 'cars': {}, '_ref': ''}})
     @patch('src.main.constants.mongo_spec.drivers')
     def test_get_drivers_cercanos(self, mock_mongoD, mock_dataUser, mock_jsonify):
         with app.app_context():
@@ -133,15 +137,7 @@ class TestAvailableDrivers(unittest.TestCase):
 
             cercanos = service._get_closer_drivers(passenger)
 
-            self.assertEqual(cercanos.__len__(), 1)
-
-    # @patch('src.main.query.requests.get', side_effect=mocked_requests_get)
-    # def test_get_data_user_ok(self, mock_request):
-    #     service = AvailableDrivers()
-    #
-    #     driver = service._get_data_user(1)
-    #
-    #     self.assertEqual(driver.json(), {'user': {}, 'token': '1'})
+            self.assertEqual(cercanos, [{'driver': {'user': 'user'}, 'position': {'lat': 10, 'lon': 14}}])
 
     @patch('src.main.query.abort')
     @patch('src.main.query.requests.get', side_effect=mocked_requests_get)
@@ -216,7 +212,7 @@ class TestAvailableTrips(unittest.TestCase):
             mock_mongoT.find.return_value = trips
             mock_mongoP.find.return_value = passenger
             service._get_data_user = MagicMock(return_value=passenger)
-            #r = passenger
+            # r = passenger
             cercanos = service._get_trips(driver)
 
             self.assertEqual(cercanos.__len__(), 0)
@@ -238,6 +234,85 @@ class TestAvailableTrips(unittest.TestCase):
 
         # mock_abort.assert_called_with(r['status_code'])
         mock_abort.assert_called()
+
+
+class TestTripsHistory(unittest.TestCase):
+    @patch('src.main.query.jsonify', side_effect=mocked_make_response)
+    @patch('src.main.query.TripHistory._get_trips', return_value=trips)
+    @patch('src.main.query.make_response', side_effect=mocked_make_response)
+    @patch('src.main.constants.mongo_spec.drivers')
+    @patch('src.main.constants.mongo_spec.passengers')
+    @patch('src.main.global_method.validate_token', return_value=True)
+    @patch('src.main.query.request')
+    def test_endepoint_passenger(self, mock_request, mock_gm, mock_mongoP, mock_mongoD, mock_mr, mock_drivers,
+                                 mock_jsonify):
+        with app.app_context():
+            service = TripHistory()
+
+            mock_request.headers = {"token": 1}
+            # mock_gm.validate_token.return_value = True
+            mock_mongoP.find_one.return_value = passenger
+
+            # mock_mr.return_value = mocked_make_response()
+
+            response = service.get(2, 'passenger')
+            # self.assertEqual(response, drivers)
+
+            mock_jsonify.assert_called_once_with(trips=trips, token=1)
+            mock_mr.assert_called_once()
+
+    @patch('src.main.query.jsonify', side_effect=mocked_make_response)
+    @patch('src.main.query.TripHistory._get_trips', return_value=trips)
+    @patch('src.main.query.make_response', side_effect=mocked_make_response)
+    @patch('src.main.constants.mongo_spec.drivers')
+    @patch('src.main.constants.mongo_spec.passengers')
+    @patch('src.main.global_method.validate_token', return_value=True)
+    @patch('src.main.query.request')
+    def test_endepoint_driver(self, mock_request, mock_gm, mock_mongoP, mock_mongoD, mock_mr, mock_drivers,
+                              mock_jsonify):
+        with app.app_context():
+            service = TripHistory()
+
+            mock_request.headers = {"token": 1}
+            # mock_gm.validate_token.return_value = True
+            mock_mongoD.find_one.return_value = driver
+
+            response = service.get(2, 'driver')
+
+            mock_jsonify.assert_called_once_with(trips=trips, token=1)
+            mock_mr.assert_called_once()
+
+    @patch('src.main.query.abort')
+    @patch('src.main.global_method.validate_token', return_value=False)
+    @patch('src.main.query.request')
+    def test_incorrect_token(self, mock_request, mock_gm, mock_abort):
+        with app.app_context():
+            service = TripHistory()
+
+            mock_request.headers.return_value = {"token": 1}
+            # mock_gm.validate_token.return_value = False
+
+            service.get(2, passenger)
+
+            mock_abort.assert_any_call(401)
+
+    @patch('src.main.query.TripHistory._get_trips', return_value=trips)
+    @patch('src.main.query.jsonify', side_effect=mocked_make_response)
+    @patch('src.main.query.make_response', side_effect=mocked_make_response)
+    @patch('src.main.constants.mongo_spec.drivers.find_one', return_value=False)
+    @patch('src.main.query.abort')
+    @patch('src.main.global_method.validate_token', return_value=False)
+    @patch('src.main.query.request')
+    def test_incorrect_id(self, mock_request, mock_gm, mock_abort, mock_mongo, mock_mr, mock_jsonify, mock_trips):
+        with app.app_context():
+            service = TripHistory()
+
+            mock_request.headers = {"token": 1}
+            # mock_mongo.find_one.return_value = False
+            # mock_abort.side_effect = mocked_abort
+            service.get(2, driver)
+
+            mock_abort.assert_any_call(404)
 
 
 if __name__ == '__main__':
